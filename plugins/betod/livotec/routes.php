@@ -158,6 +158,38 @@ Route::get('/debug-env', function () {
         'db'   => env('DB_DATABASE'),
     ]);
 });
+Route::get('/debug-db', function () {
+    $env = [
+        'DB_CONNECTION' => env('DB_CONNECTION'),
+        'DB_HOST'       => env('DB_HOST'),
+        'DB_PORT'       => env('DB_PORT'),
+        'DB_DATABASE'   => env('DB_DATABASE'),
+        'DB_USERNAME'   => env('DB_USERNAME'),
+        'DB_PASSWORD'   => env('DB_PASSWORD'),
+    ];
+
+    $config = [
+        'DB_CONNECTION' => config('database.default'),
+        'host'          => config('database.connections.mysql.host'),
+        'port'          => config('database.connections.mysql.port'),
+        'database'      => config('database.connections.mysql.database'),
+        'username'      => config('database.connections.mysql.username'),
+        'password'      => config('database.connections.mysql.password'),
+    ];
+
+    try {
+        DB::connection()->getPdo();
+        $dbStatus = '✅ DB CONNECTED';
+    } catch (\Throwable $e) {
+        $dbStatus = '❌ DB ERROR: ' . $e->getMessage();
+    }
+
+    return response()->json([
+        'ENV'     => $env,
+        'CONFIG'  => $config,
+        'STATUS'  => $dbStatus
+    ]);
+});
 
 
 Route::get('/ping', function () {
