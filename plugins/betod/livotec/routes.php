@@ -140,6 +140,14 @@ Route::get('/db-test', function () {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
 });
+Route::get('/db-check', function () {
+    try {
+        DB::connection()->getPdo();
+        return "✅ Kết nối DB thành công!";
+    } catch (\Exception $e) {
+        return "❌ Lỗi DB: " . $e->getMessage();
+    }
+});
 
 
 Route::get('/ping', function () {
