@@ -126,14 +126,19 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
 // routes/web.php
-Route::get('/db-test', function () {
+Route::get('/db-test', function() {
     try {
-        $tables = DB::select('SHOW TABLES');
-        return response()->json(['status' => 'connected', 'tables' => $tables]);
-    } catch (\Exception $e) {
+        $pdo = new PDO(
+            'mysql:host=switchback.proxy.rlwy.net;port=13259;dbname=railway',
+            'root',
+            'ftlutYQKERBIVILPTlircIVdASbeVfKT'
+        );
+        return response()->json(['status' => 'success', 'message' => 'Connected to DB']);
+    } catch (PDOException $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
 });
+
 
 Route::get('/ping', function () {
     return 'Server chạy OK';
