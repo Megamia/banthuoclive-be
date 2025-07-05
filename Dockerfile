@@ -38,7 +38,7 @@ RUN mkdir -p /root/.composer \
 # Clear Laravel config cache (sau khi cài composer)
 RUN php artisan config:clear && php artisan config:cache
 
-EXPOSE 8000
+EXPOSE ${PORT}
 
-# Run Laravel dev server
-CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
+# Run Laravel dev server với port do Railway cung cấp
+CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=${PORT}"]
