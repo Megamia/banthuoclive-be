@@ -129,13 +129,14 @@ Route::group(['prefix' => 'apiGHN'], function () {
 Route::get('/db-test', function () {
     try {
         $products = DB::table('betod_livotec_product')->get();
-        if ($products) {
-            return response()->json(['status' => 'success', 'data' => $products]);
-        } else {
-            return response()->json(['status' => 'error', 'message' => 'Không có data']);
 
+        if ($products->isEmpty()) {
+            return response()->json(['status' => 'error', 'message' => 'Không có data']);
         }
+
+        return response()->json(['status' => 'success', 'data' => $products]);
     } catch (PDOException $e) {
+        Log::error('DB Connection Failed: ' . $e->getMessage());
         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
 });
