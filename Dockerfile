@@ -35,9 +35,6 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# Clear Laravel config cache (sau khi cài composer)
-RUN php artisan config:clear
-
 EXPOSE 8000
 
 # Run Laravel dev server
