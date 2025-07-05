@@ -129,4 +129,7 @@ Route::get('/migrate', function () {
     \Artisan::call('october:migrate');
     return 'Đã chạy lệnh october:migrate!';
 });
+Route::get('/ping', function () {
+    return 'Server chạy OK';
+});
 
