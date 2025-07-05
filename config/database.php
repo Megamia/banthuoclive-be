@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => $_ENV['DB_CONNECTION'] ?? 'mysql',
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,12 +56,13 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
-            'port' => $_ENV['DB_PORT'] ?? '3306',
-            'database' => $_ENV['DB_DATABASE'] ?? 'database',
-            'username' => $_ENV['DB_USERNAME'] ?? 'root',
-            'password' => $_ENV['DB_PASSWORD'] ?? '',
-            'unix_socket' => $_ENV['DB_SOCKET'] ?? '',
+            'url' => env('DATABASE_URL'),
+            'host' => 'mysql.railway.internal',
+            'port' => '3306',
+            'database' => 'railway',
+            'username' => 'root',
+            'password' => 'CNkpheIZgbzEFsZtaGyzutbdDgvkhhio',
+            'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
@@ -69,7 +70,7 @@ return [
             'strict' => true,
             'engine' => 'InnoDB',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => $_ENV['MYSQL_ATTR_SSL_CA'] ?? null,
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
