@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => $_ENV['DB_CONNECTION'] ?? 'mysql',
 
     /*
     |--------------------------------------------------------------------------
