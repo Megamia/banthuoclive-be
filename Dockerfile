@@ -30,19 +30,20 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# Tạo auth.json rồi chạy composer install
+# Cài package
 RUN mkdir -p /root/.composer \
  && printf '%s' "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# Quyền thư mục runtime/cache (tránh lỗi ghi file)
+# Phân quyền storage/cache
 RUN mkdir -p storage bootstrap/cache \
  && chown -R www-data:www-data /var/www \
  && chmod -R 775 storage bootstrap/cache
 
+# Thêm entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 8080
-
-CMD ["sh", "-c", "echo PORT is: $PORT && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
-
-
+CMD ["/entrypoint.sh"]
