@@ -36,7 +36,7 @@ RUN mkdir -p /root/.composer \
  && rm /root/.composer/auth.json
 
 # Clear Laravel config cache (sau khi cài composer)
-RUN php artisan config:clear && php artisan config:cache
+RUN php artisan config:clear
 
 EXPOSE 8000
 
