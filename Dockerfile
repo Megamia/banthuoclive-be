@@ -1,43 +1,44 @@
 FROM php:8.2-fpm
 
-# Inject ENV từ Railway
-ARG OCTOBER_AUTH_JSON
-ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
-
-# Install system packages
+# Cài các package cần thiết
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
     unzip \
     curl \
     zip \
-    nodejs \
-    npm \
+    supervisor \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    zip \
-    cron \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+    cron && \
+    docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Cài Composer
+RUN curl -sS https://getcomposer.org/installer | php \
+    -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory
+# Copy project
 WORKDIR /var/www
-
-# Copy source code
 COPY . .
 
-# ✅ Tạo auth.json rồi cài Composer
-RUN mkdir -p /root/.composer \
- && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
- && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
- && rm /root/.composer/auth.json
+# Cài dependency cho OctoberCMS
+RUN mkdir -p /root/.composer && echo '{
+  "http-basic": {
+    "gateway.octobercms.com": {
+      "username": "luudat214@gmail.com",
+      "password": "0AQD4AmHgZwxkAGZ4YGIzLGAwAGDlZwp4AQx0MQAxAJIuBTL3LmplLwVkAQL3"
+    }
+  }
+}' > /root/.composer/auth.json && \
+composer install --ignore-platform-reqs --no-interaction --prefer-dist && \
+rm /root/.composer/auth.json
 
+# Copy cấu hình nginx & supervisord
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 8000
+EXPOSE 8080
 
-# Run Laravel dev server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["/usr/bin/supervisord"]
