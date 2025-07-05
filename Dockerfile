@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Cài các gói hệ thống cần thiết
+# Cài đặt các gói hệ thống cần thiết
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -19,29 +19,29 @@ RUN apt-get update && apt-get install -y \
 # Cài Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Thiết lập thư mục làm việc
+# Thư mục làm việc
 WORKDIR /var/www
 
-# Copy mã nguồn dự án
+# Copy mã nguồn vào container
 COPY . .
 
-# ✅ Tạo auth.json từ biến môi trường base64
+# ✅ Giải mã base64 và tạo auth.json
 ARG COMPOSER_AUTH_BASE64
 RUN mkdir -p /root/.composer && \
-    echo "$COMPOSER_AUTH_BASE64" | base64 -d > /root/.composer/auth.json
+    echo "$COMPOSER_AUTH_BASE64" | base64 -d > /root/.composer/auth.json && \
+    cat /root/.composer/auth.json
 
-# ✅ Truyền license OctoberCMS từ biến môi trường
+# ✅ Truyền license vào env cho OctoberCMS
 ARG OCTOBER_LICENSE
-ENV OCTOBER_LICENSE=${OCTOBER_LICENSE}
+ENV OCTOBER_LICENSE=$OCTOBER_LICENSE
 
-# ✅ Cài các thư viện PHP qua Composer
+# ✅ Cài các thư viện PHP
 RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist
 
-# ✅ Cài đặt và build JS (nếu có)
+# Cài frontend nếu có
 RUN npm install && npm run build
 
-# Mở cổng 8000
+# Expose port
 EXPOSE 8000
 
-# Chạy Laravel dev server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
