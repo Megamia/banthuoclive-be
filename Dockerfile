@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 ARG OCTOBER_AUTH_JSON
 ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
 
-# Install system packages
+# Cài gói cần thiết
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -17,25 +17,34 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    cron \
+    supervisor \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Install Composer
+# Cài Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory
+# Làm việc tại đây
 WORKDIR /var/www
 
-# Copy source code
+# Copy mã nguồn
 COPY . .
 
-# Tạo auth.json rồi cài Composer
+# Cài Composer (bỏ qua platform req)
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-EXPOSE 8000
+# Copy file nginx config vào đúng chỗ
+COPY nginx.conf /etc/nginx/sites-available/default
 
-# Run Laravel dev server
-CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
+# Link storage
+RUN php artisan storage:link || true
+
+# Copy Supervisor config để chạy cả nginx & php-fpm
+COPY supervisord.conf /etc/supervisord.conf
+
+EXPOSE 80
+
+# Start bằng Supervisor (chạy cả nginx và php-fpm)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
