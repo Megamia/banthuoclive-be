@@ -125,11 +125,8 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/districts/{province_id}', [GhnController::class, 'getDistricts']);
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
-Route::get('/test-db', function () {
-    try {
-        \DB::connection()->getPdo();
-        return "✅ Kết nối thành công tới DB: " . \DB::connection()->getDatabaseName();
-    } catch (\Exception $e) {
-        return "❌ Lỗi kết nối DB: " . $e->getMessage();
-    }
+Route::get('/migrate', function () {
+    \Artisan::call('october:migrate');
+    return 'Đã chạy lệnh october:migrate!';
 });
+
