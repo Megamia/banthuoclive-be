@@ -35,6 +35,9 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
+# Thêm dòng này để tạo symlink storage => public
+RUN php artisan storage:link || true
+
 EXPOSE 8000
 
 # Run Laravel dev server
