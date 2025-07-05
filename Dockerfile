@@ -38,6 +38,8 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-EXPOSE 8000
+# Không cần EXPOSE nếu Railway tự inject
+# EXPOSE ${PORT}
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT}"]
+# CMD dùng Shell form để PORT hoạt động đúng
+CMD sh -c 'php artisan serve --host=0.0.0.0 --port=${PORT}'
