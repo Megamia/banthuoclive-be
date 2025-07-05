@@ -18,8 +18,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     zip \
-    cron \
-    docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+    cron
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -30,14 +32,12 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# ✅ Tạo auth.json rồi cài Composer
+# Cài gói PHP qua Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-
 EXPOSE 8000
 
-# Run Laravel dev server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
