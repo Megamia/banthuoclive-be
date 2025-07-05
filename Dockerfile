@@ -26,6 +26,10 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
+# ✅ Truyền biến môi trường license vào container
+ARG OCTOBER_LICENSE
+ENV OCTOBER_LICENSE=${OCTOBER_LICENSE}
+
 # Install PHP dependencies
 RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist
 
