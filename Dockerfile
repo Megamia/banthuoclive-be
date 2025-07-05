@@ -13,11 +13,17 @@ WORKDIR /var/www
 
 COPY . .
 
-# ✅ Gán COMPOSER_AUTH từ biến môi trường (được Railway inject khi build)
-# Composer sẽ tự động đọc từ biến môi trường COMPOSER_AUTH
-RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist
+# 👉 KHAI BÁO ARG để nhận auth từ build context
+ARG COMPOSER_AUTH
 
-# Phân quyền cho web server (nếu cần)
+# Gán vào file auth.json bên trong container
+RUN mkdir -p /root/.composer \
+    && echo "$COMPOSER_AUTH" > /root/.composer/auth.json
+
+# ✅ Chạy composer install
+RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+    && rm -f /root/.composer/auth.json
+
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 EXPOSE 9000
