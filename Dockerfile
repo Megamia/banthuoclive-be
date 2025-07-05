@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 ARG OCTOBER_AUTH_JSON
 ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
 
-# Cài gói cần thiết
+# Install system packages
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -20,26 +20,25 @@ RUN apt-get update && apt-get install -y \
     cron \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Cài Composer
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working dir
+# Set working directory
 WORKDIR /var/www
 
-# Copy code và .env
+# Copy source code
 COPY . .
 
-# Tạo auth.json rồi cài composer
+# Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# ⚠️ Clear và cache config (phải copy .env trước bước này)
+# Clear Laravel config cache (sau khi cài composer)
 RUN php artisan config:clear && php artisan config:cache
 
-# EXPOSE mặc định, Railway không cần dòng này vẫn hoạt động
 EXPOSE 8000
 
-# ✅ Sửa CMD để đọc PORT ở runtime
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+# Run Laravel dev server
+CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
