@@ -28,10 +28,11 @@ COPY . .
 
 # ✅ Tạo auth.json từ biến môi trường base64
 ARG COMPOSER_AUTH_BASE64
+ENV COMPOSER_AUTH_BASE64=$COMPOSER_AUTH_BASE64
 RUN mkdir -p /root/.composer && \
-    echo $COMPOSER_AUTH_BASE64 | base64 -d > /root/.composer/auth.json
+    echo "$COMPOSER_AUTH_BASE64" | base64 -d > /root/.composer/auth.json
 
-# Truyền biến môi trường license vào container
+# ✅ Truyền license vào container
 ARG OCTOBER_LICENSE
 ENV OCTOBER_LICENSE=${OCTOBER_LICENSE}
 
@@ -43,5 +44,4 @@ RUN npm install && npm run build
 
 EXPOSE 8000
 
-# Run Laravel dev server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
