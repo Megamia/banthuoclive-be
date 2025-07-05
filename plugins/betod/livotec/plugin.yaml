@@ -1,0 +1,36 @@
+plugin:
+    name: 'betod.livotec::lang.plugin.name'
+    description: 'betod.livotec::lang.plugin.description'
+    author: BetoD
+    icon: oc-icon-flash
+    homepage: ''
+navigation:
+    main-menu-item:
+        label: Live
+        url: /
+        icon: icon-flash
+        sideMenu:
+            side-menu-item:
+                label: Product
+                url: betod/livotec/product
+                icon: icon-shopping-cart
+            side-menu-item2:
+                label: Category
+                url: betod/livotec/category
+                icon: icon-tag
+            side-menu-item3:
+                label: Order
+                url: betod/livotec/order
+                icon: icon-inbox
+            side-menu-item4:
+                label: Filter
+                url: betod/livotec/filter
+                icon: icon-filter
+            side-menu-item5:
+                label: Ingredients_Instructions
+                url: betod/livotec/ingredients_instructions
+                icon: icon-sitemap
+            revenue:
+                label: Revenue
+                url: betod/livotec/revenue
+                icon: icon-signal

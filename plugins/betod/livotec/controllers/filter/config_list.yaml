@@ -1,0 +1,12 @@
+list: $/betod/livotec/models/filter/columns.yaml
+modelClass: Betod\Livotec\Models\Filter
+title: Filter
+noRecordsMessage: 'backend::lang.list.no_records'
+showSetup: true
+showCheckboxes: true
+recordsPerPage: 20
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'backend::lang.list.search_prompt'
+recordUrl: 'betod/livotec/filter/update/:id'

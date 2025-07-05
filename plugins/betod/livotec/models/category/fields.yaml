@@ -1,0 +1,49 @@
+fields:
+    name:
+        label: 'Tên danh mục'
+        span: auto
+        type: text
+    slug:
+        label: Slug
+        span: auto
+        preset:
+            field: name
+            type: slug
+        type: text
+    image:
+        label: Ảnh
+        mode: image
+        useCaption: true
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: full
+        type: fileupload
+    parent:
+        label: 'Danh mục cha'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        emptyOption: '-- No Parent --'
+        type: relation
+    description:
+        label: 'Mô tả'
+        span: auto
+        type: text
+    property:
+        label: 'Tùy chỉnh mô tả'
+        prompt: 'Add new item'
+        displayMode: accordion
+        span: full
+        cssClass: ''
+        type: repeater
+        form:
+            fields:
+                label:
+                    label: Loại
+                    span: auto
+                    type: text
+                value:
+                    label: 'Mô tả'
+                    span: auto
+                    type: text

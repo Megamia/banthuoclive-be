@@ -1,0 +1,10 @@
+name: ChatBotController
+form: $/dat/chatbot/models/chatbot/fields.yaml
+modelClass: Dat\Chatbot\Models\ChatBot
+defaultRedirect: dat/chatbot/chatbotcontroller
+create:
+    redirect: 'dat/chatbot/chatbotcontroller/update/:id'
+    redirectClose: dat/chatbot/chatbotcontroller
+update:
+    redirect: dat/chatbot/chatbotcontroller
+    redirectClose: dat/chatbot/chatbotcontroller

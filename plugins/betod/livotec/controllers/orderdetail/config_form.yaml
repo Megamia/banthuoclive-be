@@ -1,0 +1,10 @@
+name: OrderDetail
+form: $/betod/livotec/models/orderdetail/fields.yaml
+modelClass: Betod\Livotec\Models\OrderDetail
+defaultRedirect: betod/livotec/orderdetail
+create:
+    redirect: 'betod/livotec/orderdetail/update/:id'
+    redirectClose: betod/livotec/orderdetail
+update:
+    redirect: betod/livotec/orderdetail
+    redirectClose: betod/livotec/orderdetail

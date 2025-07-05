@@ -1,0 +1,13 @@
+columns:
+    id:
+        label: ID
+        type: number
+    sale_date:
+        label: 'Ngày bán'
+        type: date
+    created_at:
+        label: 'Ngày tạo'
+        type: date
+    updated_at:
+        label: 'Ngày sửa'
+        type: date

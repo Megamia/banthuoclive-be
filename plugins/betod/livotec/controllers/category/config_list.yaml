@@ -1,0 +1,13 @@
+list: $/betod/livotec/models/category/columns.yaml
+modelClass: Betod\Livotec\Models\Category
+title: Category
+noRecordsMessage: 'backend::lang.list.no_records'
+showSetup: true
+showCheckboxes: true
+recordsPerPage: 20
+showTree: True
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'backend::lang.list.search_prompt'
+recordUrl: 'betod/livotec/category/update/:id'

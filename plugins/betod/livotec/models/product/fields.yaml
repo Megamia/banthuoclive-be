@@ -1,0 +1,98 @@
+tabs:
+    fields:
+        thongso:
+            label: 'Thông Số'
+            prompt: 'Add new item'
+            displayMode: accordion
+            span: full
+            type: repeater
+            tab: 'Thông số sản phẩm'
+            form:
+                fields:
+                    thuoc_tinh:
+                        label: 'Thuộc Tính'
+                        span: auto
+                        type: text
+                    gia_tri:
+                        label: 'Giá Trị'
+                        span: auto
+                        type: text
+secondaryTabs:
+    fields:
+        none:
+            label: ''
+            nameFrom: title
+            descriptionFrom: description
+            span: auto
+            hidden: 1
+            type: relation
+            tab: 0
+fields:
+    available:
+        label: 'Khả dung·'
+        span: full
+        type: switch
+    name:
+        label: 'Tên sản phẩm'
+        span: auto
+        type: text
+    slug:
+        label: Slug
+        span: auto
+        preset:
+            field: name
+            type: slug
+        type: text
+    description:
+        label: 'Mô tả'
+        size: large
+        span: full
+        type: richeditor
+    category:
+        label: 'Danh mục'
+        nameFrom: name
+        descriptionFrom: description
+        emptyOption: 'Chọn danh mục ...'
+        span: auto
+        cssClass: ''
+        required: 0
+        containerAttributes: {  }
+        type: relation
+    price:
+        label: Giá
+        span: auto
+        type: number
+    image:
+        label: 'Ảnh preview'
+        mode: image
+        useCaption: true
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: left
+        type: fileupload
+    gallery:
+        label: 'Ảnh sản phẩm'
+        mode: image
+        useCaption: true
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: auto
+        type: fileupload
+    post:
+        label: 'Đặc điểm nổi bật'
+        nameFrom: title
+        descriptionFrom: summary
+        emptyOption: 'Chọn bài viết ...'
+        span: full
+        containerAttributes: {  }
+        type: relation
+    sold_out:
+        label: 'Đã bán'
+        span: auto
+        type: number
+    stock:
+        label: 'Kho hàng'
+        span: auto
+        type: text

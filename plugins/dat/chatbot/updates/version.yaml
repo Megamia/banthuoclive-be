@@ -1,0 +1,5 @@
+v1.0.1:
+    - 'Initialize plugin'
+v1.0.2:
+    - 'Created table dat_chatbot_'
+    - builder_table_create_dat_chatbot_.php

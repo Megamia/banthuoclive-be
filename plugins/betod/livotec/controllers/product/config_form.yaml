@@ -1,0 +1,11 @@
+name: Product
+modelClass: Betod\Livotec\Models\Product
+form: $/betod/livotec/models/product/fields.yaml
+defaultRedirect: betod/livotec/product
+create:
+    redirect: 'betod/livotec/product/update/:id'
+    redirectClose: betod/livotec/product
+update:
+    redirect: betod/livotec/product
+    redirectClose: betod/livotec/product
+preview: {  }

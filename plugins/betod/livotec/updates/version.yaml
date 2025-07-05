@@ -1,0 +1,185 @@
+v1.0.1:
+    - 'Initialize plugin'
+v1.0.2:
+    - 'Created table betod_livotec_product'
+    - builder_table_create_betod_livotec_product.php
+v1.0.3:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product.php
+v1.0.4:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_2.php
+v1.0.5:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_3.php
+v1.0.6:
+    - 'Created table betod_livotec_category'
+    - builder_table_create_betod_livotec_category.php
+v1.0.7:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_4.php
+v1.0.8:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_5.php
+v1.0.9:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_6.php
+v1.0.10:
+    - 'Created table betod_livotec_product_attributes'
+    - builder_table_create_betod_livotec_product_attributes.php
+v1.0.11:
+    - 'Drop table betod_livotec_product_attributes'
+    - builder_table_delete_betod_livotec_product_attributes.php
+v1.0.12:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_7.php
+v1.0.13:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_8.php
+v1.0.14:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_9.php
+v1.0.15:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_10.php
+v1.0.16:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_11.php
+v1.0.17:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_12.php
+v1.0.18:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_13.php
+v1.0.19:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_14.php
+v1.0.20:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_15.php
+v1.0.21:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_16.php
+v1.0.22:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_17.php
+v1.0.23:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_18.php
+v1.0.24:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_19.php
+v1.0.25:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_20.php
+v1.0.26:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_21.php
+v1.0.27:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_22.php
+v1.0.28:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_23.php
+v1.0.29:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_24.php
+v1.0.30:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_25.php
+v1.0.31:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_26.php
+v1.0.32:
+    - 'Created table betod_livotec_orders'
+    - builder_table_create_betod_livotec_orders.php
+v1.0.33:
+    - 'Created table betod_livotec_order_positions'
+    - builder_table_create_betod_livotec_order_positions.php
+v1.0.34:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders.php
+v1.0.35:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_2.php
+v1.0.36:
+    - 'Updated table betod_livotec_order_positions'
+    - builder_table_update_betod_livotec_order_positions.php
+v1.0.37:
+    - 'Created table betod_livotec_filter'
+    - builder_table_create_betod_livotec_filter.php
+v1.0.44:
+    - 'Updated table betod_livotec_category'
+    - builder_table_update_betod_livotec_category.php
+v1.0.45:
+    - 'Updated table betod_livotec_category'
+    - builder_table_update_betod_livotec_category_2.php
+v1.0.46:
+    - 'Updated table betod_livotec_category'
+    - builder_table_update_betod_livotec_category_3.php
+v1.0.47:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_order.php
+v1.0.48:
+    - 'Updated table betod_livotec_order'
+    - builder_table_update_betod_livotec_orders_3.php
+v1.0.49:
+    - 'Updated table betod_livotec_order_positions'
+    - builder_table_update_betod_livotec_order_positions_2.php
+v1.0.50:
+    - 'Updated table betod_livotec_order_positions'
+    - builder_table_update_betod_livotec_order_positions_3.php
+v1.0.51:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_4.php
+v1.0.52:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_5.php
+v1.0.53:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_6.php
+v1.0.54:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_7.php
+v1.0.55:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_27.php
+v1.0.56:
+    - 'Created table betod_livotec_additional_user'
+    - builder_table_create_betod_livotec_additional_user.php
+v1.0.57:
+    - 'Updated table betod_livotec_additional_user'
+    - builder_table_update_betod_livotec_additional_user.php
+v1.0.58:
+    - 'Updated table betod_livotec_additional_user'
+    - builder_table_update_betod_livotec_additional_user_2.php
+v1.0.59:
+    - 'Updated table betod_livotec_additional_user'
+    - builder_table_update_betod_livotec_additional_user_3.php
+v1.0.60:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_28.php
+v1.0.61:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_29.php
+v1.0.62:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_30.php
+v1.0.63:
+    - 'Updated table betod_livotec_product'
+    - builder_table_update_betod_livotec_product_31.php
+v1.0.64:
+    - 'Created table betod_livotec_ingredients_instructions'
+    - builder_table_create_betod_livotec_ingredients_instructions.php
+v1.0.65:
+    - 'Updated table betod_livotec_ingredients_instructions'
+    - builder_table_update_betod_livotec_ingredientsandinstructions.php
+v1.0.66:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_8.php
+v1.0.67:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_9.php
+v1.0.68:
+    - 'Created table betod_livotec_revenue'
+    - builder_table_create_betod_livotec_revenue.php

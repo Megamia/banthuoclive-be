@@ -1,0 +1,50 @@
+columns:
+    id:
+        label: ID
+        type: number
+        searchable: true
+        sortable: true
+    order_id:
+        label: 'Order ID'
+        type: number
+        searchable: true
+        sortable: true
+    product_id:
+        label: 'Product ID'
+        type: number
+        searchable: true
+        sortable: true
+    product_name:
+        label: 'Tên sản phẩm'
+        type: text
+        searchable: true
+        sortable: true
+        select: name
+        relation: product
+    product_price:
+        label: Giá
+        type: number
+        searchable: true
+        sortable: true
+        select: price
+        relation: product
+    quantity:
+        label: 'Số lượng'
+        type: number
+        searchable: true
+        sortable: true
+    price:
+        label: 'Tổng tiền'
+        type: number
+        searchable: true
+        sortable: true
+    created_at:
+        label: 'Ngày tạo'
+        type: datetime
+        searchable: false
+        sortable: false
+    updated_at:
+        label: 'Ngày sửa'
+        type: datetime
+        searchable: false
+        sortable: false

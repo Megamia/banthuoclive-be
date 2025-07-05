@@ -1,0 +1,13 @@
+columns:
+    name:
+        label: 'Tên bộ lọc'
+        type: text
+        searchable: true
+        sortable: true
+    category_name:
+        label: 'Danh mục'
+        type: text
+        searchable: true
+        sortable: true
+        relation: category
+        select: name

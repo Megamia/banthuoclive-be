@@ -1,0 +1,31 @@
+tabs:
+    fields:
+        ingredients:
+            label: Repeater
+            prompt: 'Add new item'
+            displayMode: accordion
+            span: full
+            type: repeater
+            tab: 'Thành phần'
+            form:
+                fields:
+                    thuoc_tinh:
+                        label: 'Thuộc tính'
+                        span: auto
+                        type: text
+                    gia_tri:
+                        label: 'Giá trị'
+                        span: auto
+                        type: text
+fields:
+    product:
+        label: 'Sản phẩm'
+        nameFrom: name
+        descriptionFrom: description
+        span: full
+        type: relation
+    instructions:
+        label: 'Hướng dẫn sử dụng'
+        size: large
+        span: full
+        type: richeditor

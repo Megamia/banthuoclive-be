@@ -1,0 +1,19 @@
+columns:
+    id:
+        label: id
+        type: number
+        sortable: true
+    question:
+        label: 'Câu hỏi'
+        type: text
+    answer:
+        label: 'Trả lời'
+        type: text
+    created_at:
+        label: 'Ngày tạo'
+        type: datetime
+        sortable: true
+    updated_at:
+        label: 'Ngày sửa'
+        type: datetime
+        sortable: true

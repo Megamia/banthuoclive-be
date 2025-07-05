@@ -1,0 +1,10 @@
+name: Revenue
+form: $/betod/livotec/models/revenue/fields.yaml
+modelClass: Betod\Livotec\Models\Revenue
+defaultRedirect: betod/livotec/revenue
+create:
+    redirect: 'betod/livotec/revenue/update/:id'
+    redirectClose: betod/livotec/revenue
+update:
+    redirect: betod/livotec/revenue
+    redirectClose: betod/livotec/revenue

@@ -1,0 +1,11 @@
+plugin:
+    name: 'dat.chatbot::lang.plugin.name'
+    description: 'dat.chatbot::lang.plugin.description'
+    author: dat
+    icon: oc-icon-android
+    homepage: ''
+navigation:
+    chat-bot:
+        label: ChatBot
+        url: dat/chatbot/chatbotcontroller
+        icon: icon-android

@@ -1,0 +1,10 @@
+name: Ingredients_Instructions
+form: $/betod/livotec/models/ingredientsandinstructions/fields.yaml
+modelClass: Betod\Livotec\Models\IngredientsAndInstructions
+defaultRedirect: betod/livotec/ingredients_instructions
+create:
+    redirect: 'betod/livotec/ingredients_instructions/update/:id'
+    redirectClose: betod/livotec/ingredients_instructions
+update:
+    redirect: betod/livotec/ingredients_instructions
+    redirectClose: betod/livotec/ingredients_instructions

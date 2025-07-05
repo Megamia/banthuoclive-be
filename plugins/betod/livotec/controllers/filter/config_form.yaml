@@ -1,0 +1,10 @@
+name: Filter
+form: $/betod/livotec/models/filter/fields.yaml
+modelClass: Betod\Livotec\Models\Filter
+defaultRedirect: betod/livotec/filter
+create:
+    redirect: 'betod/livotec/filter/update/:id'
+    redirectClose: betod/livotec/filter
+update:
+    redirect: betod/livotec/filter
+    redirectClose: betod/livotec/filter

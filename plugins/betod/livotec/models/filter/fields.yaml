@@ -1,0 +1,36 @@
+fields:
+    name:
+        label: 'Tên bộ lọc'
+        span: auto
+        type: text
+    category:
+        label: 'Danh mục'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        type: relation
+    options:
+        label: 'Tùy chọn bộ lọc'
+        adding: 1
+        deleting: 1
+        searching: 1
+        span: auto
+        type: datatable
+        columns:
+            label:
+                type: string
+                title: Label
+            min:
+                type: string
+                title: Trên
+            max:
+                type: string
+                title: Dưới
+    type:
+        label: 'Kiểu bộ lọc'
+        span: auto
+        type: dropdown
+        options:
+            range: Phạm vi (Range)
+            checkbox: Hộp chọn (Checkbox)
+            radiobutton: Lựa chọn (Radiobutton)

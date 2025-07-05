@@ -1,0 +1,7 @@
+columns:
+    product_id:
+        label: 'Sản phẩm'
+        type: text
+    instructions:
+        label: 'Hướng dẫn sử dụng'
+        type: switch

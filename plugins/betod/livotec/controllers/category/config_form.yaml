@@ -1,0 +1,10 @@
+name: Category
+form: $/betod/livotec/models/category/fields.yaml
+modelClass: Betod\Livotec\Models\Category
+defaultRedirect: betod/livotec/category
+create:
+    redirect: 'betod/livotec/category/update/:id'
+    redirectClose: betod/livotec/category
+update:
+    redirect: betod/livotec/category
+    redirectClose: betod/livotec/category

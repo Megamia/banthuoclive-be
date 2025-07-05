@@ -1,0 +1,12 @@
+columns:
+    name:
+        label: 'Tên danh mục'
+        type: text
+        searchable: true
+        sortable: false
+        indent: true
+    slug:
+        label: Slug
+        type: text
+        searchable: true
+        sortable: true

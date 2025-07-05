@@ -1,0 +1,32 @@
+columns:
+    id:
+        label: ID
+        type: number
+        searchable: true
+        invisible: false
+        sortable: true
+    created_at:
+        label: 'Ngày tạo'
+        type: datetime
+        searchable: true
+        sortable: true
+    status_id:
+        label: 'Trạng thái'
+        type: partial
+        searchable: true
+        sortable: true
+        path: ~/plugins/betod/livotec/partials/_state_column.php
+    user_id:
+        label: 'Người dùng'
+        type: number
+        searchable: true
+        sortable: true
+    'property[paymenttype]':
+        label: 'Kiểu thanh toán'
+        type: partial
+        searchable: true
+        sortable: true
+        path: ~/plugins/betod/livotec/partials/_paymenttype_column.php
+    ghn_order_code:
+        label: 'GHN CODE'
+        type: text

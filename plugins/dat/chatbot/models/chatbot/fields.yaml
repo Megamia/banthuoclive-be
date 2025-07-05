@@ -1,0 +1,9 @@
+fields:
+    question:
+        label: 'Câu hỏi'
+        span: auto
+        type: text
+    answer:
+        label: 'Trả lời'
+        span: auto
+        type: text

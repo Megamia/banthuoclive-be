@@ -1,0 +1,17 @@
+fields:
+    decimal:
+        label: 'Doanh thu'
+        span: auto
+        type: text
+    created_at:
+        label: 'Ngày tạo'
+        span: auto
+        type: text
+    updated_at:
+        label: 'Ngày sửa'
+        span: auto
+        type: text
+    sale_date:
+        label: 'Ngày bán'
+        span: auto
+        type: text

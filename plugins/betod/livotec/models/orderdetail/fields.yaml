@@ -1,0 +1,27 @@
+fields:
+    id:
+        label: ID
+        span: auto
+        disabled: 1
+        type: number
+    order_id:
+        label: 'Order ID'
+        span: auto
+        disabled: 1
+        type: number
+    product_id:
+        label: 'Product ID'
+        span: auto
+        disabled: 1
+        readOnly: 0
+        type: number
+    product:
+        label: 'Sản phẩm'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        type: relation
+    quantity:
+        label: 'Số lượng'
+        span: auto
+        type: number
