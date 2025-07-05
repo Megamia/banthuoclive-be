@@ -45,4 +45,4 @@ RUN mkdir -p public/uploads \
 EXPOSE 8000
 
 # Run Laravel dev server
-CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000 --public=public"]
