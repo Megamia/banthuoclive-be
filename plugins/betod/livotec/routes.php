@@ -149,6 +149,16 @@ Route::get('/db-check', function () {
     }
 });
 
+Route::get('/debug-env', function () {
+    return response()->json([
+        'host' => env('DB_HOST'),
+        'port' => env('DB_PORT'),
+        'user' => env('DB_USERNAME'),
+        'pass' => env('DB_PASSWORD'),
+        'db'   => env('DB_DATABASE'),
+    ]);
+});
+
 
 Route::get('/ping', function () {
     return 'Server chạy OK';
