@@ -27,14 +27,15 @@ WORKDIR /var/www
 COPY . .
 
 # 👇 Tạo file auth.json chứa thông tin xác thực OctoberCMS (nên dùng biến môi trường ở Railway)
-RUN mkdir -p /root/.composer && echo '{
-  "http-basic": {
-    "gateway.octobercms.com": {
-      "username": "'${OCTOBER_USER}'",
-      "password": "'${OCTOBER_TOKEN}'"
+RUN mkdir -p /root/.composer && echo "{
+  \"http-basic\": {
+    \"gateway.octobercms.com\": {
+      \"username\": \"${OCTOBER_USER}\",
+      \"password\": \"${OCTOBER_TOKEN}\"
     }
   }
-}' > /root/.composer/auth.json
+}" > /root/.composer/auth.json
+
 
 
 # Install PHP dependencies
