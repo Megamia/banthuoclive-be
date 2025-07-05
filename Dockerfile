@@ -26,7 +26,12 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# ✅ Truyền biến môi trường license vào container
+# ✅ Tạo auth.json từ biến môi trường base64
+ARG COMPOSER_AUTH_BASE64
+RUN mkdir -p /root/.composer && \
+    echo $COMPOSER_AUTH_BASE64 | base64 -d > /root/.composer/auth.json
+
+# Truyền biến môi trường license vào container
 ARG OCTOBER_LICENSE
 ENV OCTOBER_LICENSE=${OCTOBER_LICENSE}
 
