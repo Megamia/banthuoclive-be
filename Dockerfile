@@ -1,42 +1,24 @@
-FROM php:8.2-fpm
+FROM php:8.2
 
-# Inject ENV từ Railway
-ARG OCTOBER_AUTH_JSON
-ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
-
-# Install system packages
+# Cài extension và gói cần thiết
 RUN apt-get update && apt-get install -y \
-    nginx \
-    git \
-    unzip \
-    curl \
-    zip \
-    nodejs \
-    npm \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    cron \
+    git unzip curl zip \
+    libpng-dev libonig-dev libxml2-dev libzip-dev \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Cài Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Copy mã nguồn vào container
+COPY . /var/www
+
 WORKDIR /var/www
 
-# Copy source code
-COPY . .
+# Cài package Laravel/OctoberCMS
+RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist
 
-# ✅ Tạo auth.json rồi cài Composer
-RUN mkdir -p /root/.composer \
- && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
- && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
- && rm /root/.composer/auth.json
-
-
+# Expose port Railway yêu cầu
 EXPOSE 8080
 
+# Lệnh khởi chạy Laravel (hoặc OctoberCMS)
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
