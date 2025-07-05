@@ -36,8 +36,9 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
+RUN php artisan config:clear && php artisan config:cache
 
 EXPOSE 8000
 
 # Run Laravel dev server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
