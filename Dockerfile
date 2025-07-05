@@ -1,31 +1,45 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
-# Cài các thư viện cần thiết
+# Inject ENV từ Railway
+ARG OCTOBER_AUTH_JSON
+ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
+
+# Install system packages
 RUN apt-get update && apt-get install -y \
-    git unzip curl zip libzip-dev libpng-dev libonig-dev libxml2-dev libjpeg-dev libfreetype6-dev \
-    && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring gd
+    nginx \
+    git \
+    unzip \
+    curl \
+    zip \
+    nodejs \
+    npm \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    cron \
+    && docker-php-ext-install pdo mbstring zip exif pcntl bcmath
 
-# Cài Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Set working directory
 WORKDIR /var/www
 
+# Copy source code
 COPY . .
 
-# 👉 KHAI BÁO ARG để nhận auth từ build context
-ARG COMPOSER_AUTH
-
-# Gán vào file auth.json bên trong container
+# ✅ Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
-    && echo "$COMPOSER_AUTH" > /root/.composer/auth.json
+ && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+ && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+ && rm /root/.composer/auth.json
 
-# ✅ Chạy composer install
-RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist \
-    && rm -f /root/.composer/auth.json
+# Install JS dependencies
+RUN npm install && npm run build
 
-RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
+EXPOSE 8000
 
-EXPOSE 9000
-
-CMD ["php-fpm"]
+# Run Laravel dev server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
