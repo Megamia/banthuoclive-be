@@ -30,13 +30,14 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# ✅ Tạo auth.json rồi cài Composer
+# Clear Laravel config cache
+RUN php artisan config:clear && php artisan config:cache
+
+# Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
-
-RUN php artisan config:clear && php artisan config:cache
 
 EXPOSE 8000
 
