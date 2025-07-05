@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 ARG OCTOBER_AUTH_JSON
 ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
 
-# Install packages
+# Install system packages
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -17,45 +17,27 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    zip \
     cron \
-    supervisor \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+    && docker-php-ext-install pdo mbstring zip exif pcntl bcmath
 
-# Install composer
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy source
+# Copy source code
 COPY . .
 
-# Composer install
+# ✅ Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
- && printf '%s' "$COMPOSER_AUTH" > /root/.composer/auth.json \
+ && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# Set permission
-RUN mkdir -p storage bootstrap/cache \
- && chown -R www-data:www-data /var/www \
- && chmod -R 775 storage bootstrap/cache
 
-# Tạo thư mục log cho nginx (ngừa lỗi 502)
-RUN mkdir -p /var/log/nginx
+EXPOSE 8000
 
-# Copy nginx + supervisord config
-COPY .docker/nginx.conf /etc/nginx/nginx.conf
-COPY .docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Clear Laravel/October cache
-RUN php artisan config:clear \
- && php artisan cache:clear \
- && php artisan view:clear || true  # Cho phép tiếp tục nếu chưa đủ ENV
-
-# Tùy chọn: migrate nếu đã config DB (không bắt buộc)
-# RUN php artisan migrate --force || true
-
-EXPOSE 8080
-
-CMD ["/usr/bin/supervisord", "-n"]
+# Run Laravel dev server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
