@@ -1,4 +1,4 @@
-FROM php:8.2
+FROM php:8.2-fpm
 
 # Cài extension và gói cần thiết
 RUN apt-get update && apt-get install -y \
@@ -9,19 +9,21 @@ RUN apt-get update && apt-get install -y \
 # Cài Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Tạo thư mục project và set quyền
-WORKDIR /var/www
+# Copy mã nguồn vào container
 COPY . /var/www
 
-# Set quyền (tránh lỗi ghi file runtime/cache/logs)
-RUN chown -R www-data:www-data /var/www \
+WORKDIR /var/www
+
+# Tạo thư mục nếu thiếu và cấp quyền đúng
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Cài package Laravel hoặc OctoberCMS
+# Cài package Laravel/OctoberCMS
 RUN composer install --ignore-platform-reqs --no-interaction --prefer-dist
 
-# EXPOSE port Railway yêu cầu
+# Expose port Railway yêu cầu
 EXPOSE 8080
 
-# Chạy OctoberCMS (Laravel-based) server
+# Khởi chạy bằng built-in server
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
