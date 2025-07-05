@@ -38,6 +38,8 @@ RUN mkdir -p /root/.composer \
 RUN mkdir -p storage bootstrap/cache \
  && chown -R www-data:www-data /var/www \
  && chmod -R 775 storage bootstrap/cache
+ 
+RUN mkdir -p /var/log/nginx
 
 # Copy nginx config
 COPY .docker/nginx.conf /etc/nginx/nginx.conf
