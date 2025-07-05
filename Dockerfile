@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    zip \
     cron \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
@@ -30,14 +29,14 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# Clear Laravel config cache
-RUN php artisan config:clear && php artisan config:cache
-
 # Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
+
+# Clear Laravel config cache (sau khi cài composer)
+RUN php artisan config:clear && php artisan config:cache
 
 EXPOSE 8000
 
