@@ -126,12 +126,12 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
 // routes/web.php
-Route::get('/test-db', function () {
+Route::get('/db-test', function () {
     try {
-        \DB::connection()->getPdo();
-        return "Database connection is OK!";
+        $tables = DB::select('SHOW TABLES');
+        return response()->json(['status' => 'connected', 'tables' => $tables]);
     } catch (\Exception $e) {
-        return "Could not connect to the database. Error: " . $e->getMessage();
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
 });
 
