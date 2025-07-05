@@ -35,8 +35,12 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# Thêm dòng này để tạo symlink storage => public
+# Tạo symlink cho storage
 RUN php artisan storage:link || true
+
+# ✅ Copy uploads/public sang public/uploads để FE có thể truy cập ảnh
+RUN mkdir -p public/uploads \
+ && cp -r storage/app/uploads/public/* public/uploads/ || true
 
 EXPOSE 8000
 
