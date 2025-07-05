@@ -1,6 +1,10 @@
 FROM php:8.2-fpm
 
-# Cài các gói cần thiết
+# Inject ENV từ Railway
+ARG OCTOBER_AUTH_JSON
+ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
+
+# Install system packages
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -13,35 +17,27 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    zip \
     cron \
-    supervisor
+    && docker-php-ext-install pdo mbstring zip exif pcntl bcmath
 
-# Cài các extension PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Cài Composer
-RUN curl -sS https://getcomposer.org/installer | php \
-    -- --install-dir=/usr/local/bin --filename=composer
-
-# Tạo thư mục làm việc
+# Set working directory
 WORKDIR /var/www
 
-# Copy mã nguồn vào container
+# Copy source code
 COPY . .
 
-# Cài các package PHP (OctoberCMS)
-RUN mkdir -p /root/.composer && \
-    echo '{"http-basic":{"gateway.octobercms.com":{"username":"luudat214@gmail.com","password":"0AQD4AmHgZwxkAGZ4YGIzLGAwAGDlZwp4AQx0MQAxAJIuBTL3LmplLwVkAQL3"}}}' \
-    > /root/.composer/auth.json && \
-    composer install --ignore-platform-reqs --no-interaction --prefer-dist && \
-    rm /root/.composer/auth.json
+# ✅ Tạo auth.json rồi cài Composer
+RUN mkdir -p /root/.composer \
+ && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+ && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+ && rm /root/.composer/auth.json
 
-# Copy file cấu hình nginx và supervisor
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY supervisord.conf /etc/supervisord.conf
 
-# Railway yêu cầu expose port 8080
-EXPOSE 8080
+EXPOSE 8000
 
-# Chạy nginx + php-fpm bằng supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Run Laravel dev server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
