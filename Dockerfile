@@ -36,8 +36,6 @@ RUN mkdir -p /root/.composer \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
  && rm /root/.composer/auth.json
 
-# Install JS dependencies
-RUN npm install && npm run build
 
 EXPOSE 8000
 
