@@ -125,10 +125,16 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/districts/{province_id}', [GhnController::class, 'getDistricts']);
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
-Route::get('/migrate', function () {
-    \Artisan::call('october:migrate');
-    return 'Đã chạy lệnh october:migrate!';
+// routes/web.php
+Route::get('/test-db', function () {
+    try {
+        \DB::connection()->getPdo();
+        return "Database connection is OK!";
+    } catch (\Exception $e) {
+        return "Could not connect to the database. Error: " . $e->getMessage();
+    }
 });
+
 Route::get('/ping', function () {
     return 'Server chạy OK';
 });
