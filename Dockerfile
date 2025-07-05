@@ -38,6 +38,6 @@ RUN mkdir -p /root/.composer \
 # Clear Laravel config cache (sau khi cài composer)
 RUN php artisan config:clear && php artisan config:cache
 
-EXPOSE 8080
+EXPOSE 8000
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
