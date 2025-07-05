@@ -126,14 +126,15 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
 // routes/web.php
-Route::get('/db-test', function() {
+Route::get('/db-test', function () {
     try {
-        $pdo = new PDO(
-            'mysql:host=switchback.proxy.rlwy.net;port=13259;dbname=railway',
-            'root',
-            'ftlutYQKERBIVILPTlircIVdASbeVfKT'
-        );
-        return response()->json(['status' => 'success', 'message' => 'Connected to DB']);
+        $products = DB::table('betod_livotec_product')->get();
+        if ($products) {
+            return response()->json(['status' => 'success', 'data' => $products]);
+        } else {
+            return response()->json(['status' => 'error', 'message' => 'Không có data']);
+
+        }
     } catch (PDOException $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
