@@ -38,8 +38,8 @@ RUN mkdir -p /root/.composer \
 # ⚠️ Clear và cache config (phải copy .env trước bước này)
 RUN php artisan config:clear && php artisan config:cache
 
-# Mở port
-EXPOSE ${PORT}
+# EXPOSE mặc định, Railway không cần dòng này vẫn hoạt động
+EXPOSE 8000
 
-# ✅ Run server đúng cách với Railway
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT}"]
+# ✅ Sửa CMD để đọc PORT ở runtime
+CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
