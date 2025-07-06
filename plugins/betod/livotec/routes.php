@@ -22,13 +22,20 @@ if (!function_exists('imagePathToRelative')) {
 if (!function_exists('getCloudinaryUrlFromDiskName')) {
     function getCloudinaryUrlFromDiskName($diskName, $folder = 'livotec')
     {
-        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $cloudName = config('cloudinary.cloud_name');
+
+        if (!$cloudName) {
+            \Log::warning("⚠️ Không lấy được cloud_name từ config.");
+            return null;
+        }
+
         $ext = pathinfo($diskName, PATHINFO_EXTENSION);
         $name = pathinfo($diskName, PATHINFO_FILENAME);
 
         return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
     }
 }
+
 
 // ✅ Hàm gắn URL Cloudinary vào sản phẩm
 if (!function_exists('attachCloudinaryUrlToProduct')) {
