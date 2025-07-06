@@ -39,6 +39,8 @@ EXPOSE 8000
 
 # Run Laravel dev server
 CMD ["sh", "-c", "\
+  mkdir -p /var/www/public && \
+  mkdir -p /var/www/public/uploads && \
   echo '📂 Kiểm tra thư mục /var/www/public/uploads:' && \
   if [ -d /var/www/public/uploads ]; then \
     if [ \"$(ls -A /var/www/public/uploads)\" ]; then \
