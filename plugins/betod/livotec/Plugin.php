@@ -1,4 +1,5 @@
-<?php namespace Betod\Livotec;
+<?php
+namespace Betod\Livotec;
 
 use System\Classes\PluginBase;
 
@@ -12,6 +13,7 @@ class Plugin extends PluginBase
      */
     public function register()
     {
+        $this->registerConsoleCommand('livotec.upload-images', \Betod\Livotec\Console\UploadImagesToCloudinary::class);
     }
 
     /**

@@ -6,9 +6,47 @@ use Betod\Livotec\Models\Orders;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
 use Betod\Livotec\Controllers\PayPalController;
-use Betod\Livotec\Controllers\UploadController;
+// use Betod\Livotec\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+
+// ✅ Hàm xử lý imagePath từ OctoberCMS
+if (!function_exists('imagePathToRelative')) {
+    function imagePathToRelative($diskName)
+    {
+        return substr($diskName, 0, 3) . '/' . substr($diskName, 3, 3) . '/' . substr($diskName, 6, 3) . '/' . $diskName;
+    }
+}
+
+// ✅ Hàm tạo URL Cloudinary
+if (!function_exists('getCloudinaryUrlFromDiskName')) {
+    function getCloudinaryUrlFromDiskName($diskName, $folder = 'livotec')
+    {
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $ext = pathinfo($diskName, PATHINFO_EXTENSION);
+        $name = pathinfo($diskName, PATHINFO_FILENAME);
+
+        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
+    }
+}
+
+// ✅ Hàm gắn URL Cloudinary vào sản phẩm
+if (!function_exists('attachCloudinaryUrlToProduct')) {
+    function attachCloudinaryUrlToProduct($product)
+    {
+        if ($product->image) {
+            $product->image->cloudinary_url = getCloudinaryUrlFromDiskName($product->image->disk_name);
+        }
+
+        if ($product->gallery) {
+            foreach ($product->gallery as $img) {
+                $img->cloudinary_url = getCloudinaryUrlFromDiskName($img->disk_name);
+            }
+        }
+
+        return $product;
+    }
+}
 
 Route::group(['prefix' => 'apiProduct'], function () {
     // Route::get("allProduct", function () {
@@ -20,27 +58,10 @@ Route::group(['prefix' => 'apiProduct'], function () {
     //         ]);
     //     });
     // });
-    function imagePathToRelative($diskName)
-    {
-        return substr($diskName, 0, 3) . '/' . substr($diskName, 3, 3) . '/' . substr($diskName, 6, 3) . '/' . $diskName;
-    }
-
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
 
-        $allProduct->transform(function ($product) {
-            if ($product->image) {
-                $product->image->full_url = URL::to('storage/uploads/public/' . imagePathToRelative($product->image->disk_name));
-            }
-
-            if ($product->gallery) {
-                foreach ($product->gallery as $img) {
-                    $img->full_url = URL::to('storage/uploads/public/' . imagePathToRelative($img->disk_name));
-                }
-            }
-
-            return $product;
-        });
+        $allProduct->transform(fn($p) => attachCloudinaryUrlToProduct($p));
 
         return response()->json([
             'allProduct' => $allProduct,
@@ -60,6 +81,8 @@ Route::group(['prefix' => 'apiProduct'], function () {
             ->whereIn('category_id', $categoryIds)
             ->get();
 
+        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+
         return response()->json([
             'category' => $category,
             'products' => $products,
@@ -74,14 +97,23 @@ Route::group(['prefix' => 'apiProduct'], function () {
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        return Product::with(['gallery', 'image', 'category.parent', 'post'])
+        $products = Product::with(['gallery', 'image', 'category.parent', 'post'])
             ->where('category_id', $category->id)
             ->get();
+
+        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+
+        return $products;
     });
 
     Route::get('detailProduct/{slug}', function ($slug) {
         $product = Product::with(['gallery', 'image', 'category.parent', 'post'])->where('slug', $slug)->first();
-        return $product ?: response()->json(['message' => 'Product not found'], 404);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        return attachCloudinaryUrlToProduct($product);
     });
 });
 
@@ -146,7 +178,3 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/districts/{province_id}', [GhnController::class, 'getDistricts']);
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
-// routes/web.php
-Route::post('/upload', [UploadController::class, 'upload']);
-
-
