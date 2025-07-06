@@ -52,4 +52,7 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8000
 
 # CMD: thay biến $PORT và start cả nginx + php-fpm
-CMD sh -c "envsubst '\$PORT' < /etc/nginx/sites-available/default.template > /etc/nginx/sites-available/default && /usr/bin/supervisord -n"
+CMD sh -c "\
+  echo '🚀 Railway PORT = '$PORT; \
+  netstat -tulpn | grep LISTEN || ss -tulpn || echo '🔍 netstat not found'; \
+  sleep 3 && /usr/bin/supervisord -n"
