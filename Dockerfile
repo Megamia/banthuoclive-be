@@ -29,7 +29,11 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# Tạo auth.json rồi cài Composer
+# Sao lưu ảnh gốc sang thư mục tạm trong image
+RUN mkdir -p /var/www/_original_uploads \
+ && cp -r storage/app/uploads/public /var/www/_original_uploads/
+
+# Cài đặt Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
  && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
@@ -37,19 +41,20 @@ RUN mkdir -p /root/.composer \
 
 EXPOSE 8000
 
-# Run Laravel dev server
+# Start script
 CMD ["sh", "-c", "\
-  mkdir -p /var/www/public && \
-  mkdir -p /var/www/public/uploads && \
-  echo '📂 Kiểm tra thư mục /var/www/public/uploads:' && \
-  if [ -d /var/www/public/uploads ]; then \
-    if [ \"$(ls -A /var/www/public/uploads)\" ]; then \
-      echo '✅ Danh sách ảnh:' && ls -R /var/www/public/uploads; \
-    else \
-      echo '⚠️  Thư mục uploads tồn tại nhưng rỗng'; \
-    fi; \
+  echo '📂 Kiểm tra thư mục volume uploads...' && \
+  mkdir -p /var/www/storage/app/uploads/public && \
+  if [ -z \"$(ls -A /var/www/storage/app/uploads/public 2>/dev/null)\" ]; then \
+    echo '📥 Volume đang trống, đang copy ảnh mẫu...' && \
+    cp -r /var/www/_original_uploads/public/* /var/www/storage/app/uploads/public/; \
   else \
-    echo '❌ Thư mục /var/www/public/uploads không tồn tại'; \
+    echo '✅ Volume đã có dữ liệu'; \
   fi && \
+  mkdir -p /var/www/public && \
+  rm -rf /var/www/public/uploads && \
+  ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
+  echo '📂 Danh sách ảnh trong /public/uploads:' && \
+  ls -R /var/www/public/uploads && \
   php -S 0.0.0.0:8000 -t public \
 "]
