@@ -1,6 +1,10 @@
 FROM php:8.2-fpm
 
-# Cài đặt các gói hệ thống cần thiết
+# Inject ENV từ Railway
+ARG OCTOBER_AUTH_JSON
+ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
+
+# Install system packages
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -16,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     cron \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Cài Composer
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set working directory
@@ -25,24 +29,13 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# Sao lưu ảnh mẫu nếu có
-RUN mkdir -p /var/www/_original_uploads && \
-    if [ -d "storage/app/uploads/public" ]; then \
-        cp -r storage/app/uploads/public/* /var/www/_original_uploads/ && \
-        echo "✅ Đã sao lưu ảnh mẫu."; \
-    else \
-        echo "⚠️  Không tìm thấy thư mục ảnh mẫu, bỏ qua."; \
-    fi
+# Tạo auth.json rồi cài Composer
+RUN mkdir -p /root/.composer \
+ && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+ && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+ && rm /root/.composer/auth.json
 
-# Cài đặt Composer dependencies (nếu cần auth)
-RUN mkdir -p /root/.composer && \
-    sh -c 'echo "$COMPOSER_AUTH"' > /root/.composer/auth.json && \
-    composer install --no-interaction --prefer-dist --no-dev && \
-    rm /root/.composer/auth.json
+EXPOSE 8000
 
-# Copy entrypoint.sh và cấp quyền thực thi
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Dùng entrypoint khi container khởi động
-ENTRYPOINT ["/entrypoint.sh"]
+# Run Laravel dev server
+CMD ["sh", "-c", "sleep 10 && php artisan serve --host=0.0.0.0 --port=8000"]
