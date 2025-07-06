@@ -38,10 +38,9 @@ RUN mkdir -p /var/www/_original_uploads && \
     echo "⚠️  Không tìm thấy thư mục ảnh mẫu, bỏ qua."; \
     fi
 
-# Cài đặt Composer
-RUN mkdir -p /root/.composer && \
-    echo "$COMPOSER_AUTH" > /root/.composer/auth.json && \
-    composer install --ignore-platform-reqs --no-interaction --prefer-dist && \
+# Cài đặt Composer (ẩn token)
+RUN sh -c 'echo "$COMPOSER_AUTH"' > /root/.composer/auth.json && \
+    composer install --no-interaction --prefer-dist --no-dev --quiet && \
     rm /root/.composer/auth.json
 
 EXPOSE 8000
@@ -51,6 +50,7 @@ CMD ["sh", "-c", "\
     echo '📂 Kiểm tra thư mục volume uploads...' && \
     mkdir -p /var/www/storage/app/uploads/public && \
     echo '📥 Đang ép copy ảnh mẫu vào volume...' && \
+    echo '📂 Ảnh mẫu có trong _original_uploads:' && ls -lR /var/www/_original_uploads/public && \
     if [ -d /var/www/_original_uploads/public ]; then \
     cp -a /var/www/_original_uploads/public/. /var/www/storage/app/uploads/public/ && \
     echo '✅ Đã copy ảnh mẫu vào volume.'; \
