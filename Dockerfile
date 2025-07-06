@@ -39,7 +39,8 @@ RUN mkdir -p /var/www/_original_uploads && \
     fi
 
 # Cài đặt Composer (ẩn token)
-RUN sh -c 'echo "$COMPOSER_AUTH"' > /root/.composer/auth.json && \
+RUN mkdir -p /root/.composer && \
+    sh -c 'echo "$COMPOSER_AUTH"' > /root/.composer/auth.json && \
     composer install --no-interaction --prefer-dist --no-dev --quiet && \
     rm /root/.composer/auth.json
 
