@@ -6,6 +6,7 @@ use Betod\Livotec\Models\Orders;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
 use Betod\Livotec\Controllers\PayPalController;
+use Betod\Livotec\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -146,73 +147,6 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
 });
 // routes/web.php
-Route::get('/db-test', function () {
-    try {
-        $products = DB::table('betod_livotec_product')->get();
+Route::post('/upload', [UploadController::class, 'upload']);
 
-        if ($products->isEmpty()) {
-            return response()->json(['status' => 'error', 'message' => 'Không có data']);
-        }
-
-        return response()->json(['status' => 'success', 'data' => $products]);
-    } catch (PDOException $e) {
-        Log::error('DB Connection Failed: ' . $e->getMessage());
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-});
-Route::get('/db-check', function () {
-    try {
-        DB::connection()->getPdo();
-        return "✅ Kết nối DB thành công!";
-    } catch (\Exception $e) {
-        return "❌ Lỗi DB: " . $e->getMessage();
-    }
-});
-
-Route::get('/debug-env', function () {
-    return response()->json([
-        'host' => env('DB_HOST'),
-        'port' => env('DB_PORT'),
-        'user' => env('DB_USERNAME'),
-        'pass' => env('DB_PASSWORD'),
-        'db' => env('DB_DATABASE'),
-    ]);
-});
-Route::get('/debug-db', function () {
-    $env = [
-        'DB_CONNECTION' => env('DB_CONNECTION'),
-        'DB_HOST' => env('DB_HOST'),
-        'DB_PORT' => env('DB_PORT'),
-        'DB_DATABASE' => env('DB_DATABASE'),
-        'DB_USERNAME' => env('DB_USERNAME'),
-        'DB_PASSWORD' => env('DB_PASSWORD'),
-    ];
-
-    $config = [
-        'DB_CONNECTION' => config('database.default'),
-        'host' => config('database.connections.mysql.host'),
-        'port' => config('database.connections.mysql.port'),
-        'database' => config('database.connections.mysql.database'),
-        'username' => config('database.connections.mysql.username'),
-        'password' => config('database.connections.mysql.password'),
-    ];
-
-    try {
-        DB::connection()->getPdo();
-        $dbStatus = '✅ DB CONNECTED';
-    } catch (\Throwable $e) {
-        $dbStatus = '❌ DB ERROR: ' . $e->getMessage();
-    }
-
-    return response()->json([
-        'ENV' => $env,
-        'CONFIG' => $config,
-        'STATUS' => $dbStatus
-    ]);
-});
-
-
-Route::get('/ping', function () {
-    return 'Server chạy OK';
-});
 
