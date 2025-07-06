@@ -29,6 +29,9 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
+RUN ln -s ../storage/app/uploads public/uploads
+
+
 # Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
  && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
