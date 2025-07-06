@@ -46,5 +46,5 @@ CMD ["sh", "-c", "\
   ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
   echo '📂 Danh sách file:' && \
   ls -al /var/www/public/uploads && \
-  php artisan serve --host=0.0.0.0 --port=8000 \
+  php -S 0.0.0.0:8000 vendor/october/rain/src/Foundation/resources/server.php \
 "]
