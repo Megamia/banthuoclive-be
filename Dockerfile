@@ -38,4 +38,5 @@ RUN mkdir -p /root/.composer \
 EXPOSE 8000
 
 # Run Laravel dev server
-CMD ["sh", "-c", "sleep 10 && php -S 0.0.0.0:8000 -t /var/www"]
+CMD ["sh", "-c", "sleep 10 && ls -al /var/www/storage/app/uploads/public && php -S 0.0.0.0:8000 -t /var/www"]
+
