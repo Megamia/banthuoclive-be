@@ -53,7 +53,7 @@ CMD ["sh", "-c", "\
   if [ -z \"$(ls -A /var/www/storage/app/uploads/public 2>/dev/null)\" ]; then \
     echo '📥 Volume đang trống, đang copy ảnh mẫu...' && \
     if [ -d /var/www/_original_uploads/public ]; then \
-      cp -r /var/www/_original_uploads/public/* /var/www/storage/app/uploads/public/ && \
+      cp -a /var/www/_original_uploads/public/. /var/www/storage/app/uploads/public/ && \
       echo '✅ Đã copy ảnh mẫu vào volume.'; \
     else \
       echo '❌ Không có ảnh mẫu để copy.'; \
