@@ -32,10 +32,10 @@ COPY . .
 # Sao lưu ảnh gốc nếu tồn tại
 RUN mkdir -p /var/www/_original_uploads && \
     if [ -d "storage/app/uploads/public" ]; then \
-        cp -r storage/app/uploads/public /var/www/_original_uploads/; \
-        echo "✅ Đã sao lưu ảnh mẫu."; \
+    cp -r storage/app/uploads/public /var/www/_original_uploads/; \
+    echo "✅ Đã sao lưu ảnh mẫu."; \
     else \
-        echo "⚠️  Không tìm thấy thư mục ảnh mẫu, bỏ qua."; \
+    echo "⚠️  Không tìm thấy thư mục ảnh mẫu, bỏ qua."; \
     fi
 
 # Cài đặt Composer
@@ -48,23 +48,23 @@ EXPOSE 8000
 
 # Start script
 CMD ["sh", "-c", "\
-  echo '📂 Kiểm tra thư mục volume uploads...' && \
-  mkdir -p /var/www/storage/app/uploads/public && \
-  if [ -z \"$(ls -A /var/www/storage/app/uploads/public 2>/dev/null)\" ]; then \
+    echo '📂 Kiểm tra thư mục volume uploads...' && \
+    mkdir -p /var/www/storage/app/uploads/public && \
+    if [ -z \"$(ls -A /var/www/storage/app/uploads/public 2>/dev/null)\" ]; then \
     echo '📥 Volume đang trống, đang copy ảnh mẫu...' && \
     if [ -d /var/www/_original_uploads/public ]; then \
-      cp -a /var/www/_original_uploads/public/. /var/www/storage/app/uploads/public/ && \
-      echo '✅ Đã copy ảnh mẫu vào volume.'; \
+    cp -a /var/www/_original_uploads/public/. /var/www/storage/app/uploads/public/ && \
+    echo '✅ Đã copy ảnh mẫu vào volume.'; \
     else \
-      echo '❌ Không có ảnh mẫu để copy.'; \
+    echo '❌ Không có ảnh mẫu để copy.'; \
     fi; \
-  else \
+    else \
     echo '✅ Volume đã có dữ liệu.'; \
-  fi && \
-  mkdir -p /var/www/public && \
-  rm -rf /var/www/public/uploads && \
-  ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
-  echo '📂 Danh sách ảnh trong /public/uploads:' && \
-  ls -R /var/www/public/uploads || echo '❌ Không có ảnh nào!' && \
-  php -S 0.0.0.0:8000 -t public \
-"]
+    fi && \
+    mkdir -p /var/www/public && \
+    rm -rf /var/www/public/uploads && \
+    ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
+    echo '📂 Danh sách ảnh trong /public/uploads:' && \
+    ls -R /var/www/public/uploads || echo '❌ Không có ảnh nào!' && \
+    php -S 0.0.0.0:8000 -t . \
+    "]
