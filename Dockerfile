@@ -40,8 +40,9 @@ RUN mkdir -p /root/.composer \
 RUN mkdir -p public && rm -rf public/uploads && ln -s ../storage/app/uploads public/uploads
 
 # Phân quyền cho Laravel
-RUN chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
+RUN mkdir -p bootstrap/cache && \
+    chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
 
 # Copy file config nginx và supervisor
 COPY docker/nginx.conf /etc/nginx/sites-available/default.template
