@@ -37,7 +37,7 @@ RUN mkdir -p /root/.composer \
  && rm /root/.composer/auth.json
 
 # Tạo symlink từ public/uploads → storage/app/uploads
-RUN rm -rf public/uploads && ln -s ../storage/app/uploads public/uploads
+RUN mkdir -p public && rm -rf public/uploads && ln -s ../storage/app/uploads public/uploads
 
 # Phân quyền cho Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache \
