@@ -32,9 +32,11 @@ COPY . .
 
 # Cài Composer
 RUN mkdir -p /root/.composer \
- && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
- && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
- && rm /root/.composer/auth.json
+    && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+    && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+    && rm /root/.composer/auth.json
+
+RUN sed -i 's|^listen = .*|listen = 127.0.0.1:9000|' /usr/local/etc/php-fpm.d/www.conf
 
 # Tạo symlink từ public/uploads → storage/app/uploads
 RUN mkdir -p public && rm -rf public/uploads && ln -s ../storage/app/uploads public/uploads
@@ -53,6 +55,6 @@ EXPOSE 8000
 
 # CMD: thay biến $PORT và start cả nginx + php-fpm
 CMD sh -c "\
-  echo '🚀 Railway PORT = '$PORT; \
-  netstat -tulpn | grep LISTEN || ss -tulpn || echo '🔍 netstat not found'; \
-  sleep 3 && /usr/bin/supervisord -n"
+    echo '🚀 Railway PORT = '$PORT; \
+    netstat -tulpn | grep LISTEN || ss -tulpn || echo '🔍 netstat not found'; \
+    sleep 3 && /usr/bin/supervisord -n"
