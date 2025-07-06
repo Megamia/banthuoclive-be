@@ -61,10 +61,9 @@ CMD ["sh", "-c", "\
     else \
     echo '✅ Volume đã có dữ liệu.'; \
     fi && \
-    mkdir -p /var/www/public && \
-    rm -rf /var/www/public/uploads && \
-    ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
-    echo '📂 Danh sách ảnh trong /public/uploads:' && \
-    ls -R /var/www/public/uploads || echo '❌ Không có ảnh nào!' && \
+    rm -rf /var/www/uploads && \
+    ln -s /var/www/storage/app/uploads/public /var/www/uploads && \
+    echo '📂 Danh sách ảnh trong /uploads:' && \
+    ls -R /var/www/uploads || echo '❌ Không có ảnh nào!' && \
     php -S 0.0.0.0:8000 -t . \
     "]
