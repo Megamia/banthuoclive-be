@@ -31,9 +31,13 @@ COPY . .
 
 # Tạo auth.json rồi cài Composer
 RUN mkdir -p /root/.composer \
- && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
- && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
- && rm /root/.composer/auth.json
+    && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+    && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
+    && rm /root/.composer/auth.json
+
+RUN mkdir -p /var/www/public \
+    && mkdir -p /var/www/storage/app/public
+
 
 EXPOSE 8000
 

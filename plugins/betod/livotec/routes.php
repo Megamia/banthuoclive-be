@@ -7,6 +7,7 @@ use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
 use Betod\Livotec\Controllers\PayPalController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 
 Route::group(['prefix' => 'apiProduct'], function () {
     // Route::get("allProduct", function () {
@@ -18,8 +19,27 @@ Route::group(['prefix' => 'apiProduct'], function () {
     //         ]);
     //     });
     // });
+    function imagePathToRelative($diskName)
+    {
+        return substr($diskName, 0, 3) . '/' . substr($diskName, 3, 3) . '/' . substr($diskName, 6, 3) . '/' . $diskName;
+    }
+
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
+
+        $allProduct->transform(function ($product) {
+            if ($product->image) {
+                $product->image->full_url = URL::to('storage/uploads/public/' . imagePathToRelative($product->image->disk_name));
+            }
+
+            if ($product->gallery) {
+                foreach ($product->gallery as $img) {
+                    $img->full_url = URL::to('storage/uploads/public/' . imagePathToRelative($img->disk_name));
+                }
+            }
+
+            return $product;
+        });
 
         return response()->json([
             'allProduct' => $allProduct,
@@ -155,26 +175,26 @@ Route::get('/debug-env', function () {
         'port' => env('DB_PORT'),
         'user' => env('DB_USERNAME'),
         'pass' => env('DB_PASSWORD'),
-        'db'   => env('DB_DATABASE'),
+        'db' => env('DB_DATABASE'),
     ]);
 });
 Route::get('/debug-db', function () {
     $env = [
         'DB_CONNECTION' => env('DB_CONNECTION'),
-        'DB_HOST'       => env('DB_HOST'),
-        'DB_PORT'       => env('DB_PORT'),
-        'DB_DATABASE'   => env('DB_DATABASE'),
-        'DB_USERNAME'   => env('DB_USERNAME'),
-        'DB_PASSWORD'   => env('DB_PASSWORD'),
+        'DB_HOST' => env('DB_HOST'),
+        'DB_PORT' => env('DB_PORT'),
+        'DB_DATABASE' => env('DB_DATABASE'),
+        'DB_USERNAME' => env('DB_USERNAME'),
+        'DB_PASSWORD' => env('DB_PASSWORD'),
     ];
 
     $config = [
         'DB_CONNECTION' => config('database.default'),
-        'host'          => config('database.connections.mysql.host'),
-        'port'          => config('database.connections.mysql.port'),
-        'database'      => config('database.connections.mysql.database'),
-        'username'      => config('database.connections.mysql.username'),
-        'password'      => config('database.connections.mysql.password'),
+        'host' => config('database.connections.mysql.host'),
+        'port' => config('database.connections.mysql.port'),
+        'database' => config('database.connections.mysql.database'),
+        'username' => config('database.connections.mysql.username'),
+        'password' => config('database.connections.mysql.password'),
     ];
 
     try {
@@ -185,9 +205,9 @@ Route::get('/debug-db', function () {
     }
 
     return response()->json([
-        'ENV'     => $env,
-        'CONFIG'  => $config,
-        'STATUS'  => $dbStatus
+        'ENV' => $env,
+        'CONFIG' => $config,
+        'STATUS' => $dbStatus
     ]);
 });
 
