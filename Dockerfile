@@ -39,12 +39,15 @@ EXPOSE 8000
 
 # Run Laravel dev server
 CMD ["sh", "-c", "\
-  sleep 5 && \
-  mkdir -p /var/www/public && \
-  mkdir -p /var/www/storage/app/uploads/public && \
-  rm -rf /var/www/public/uploads && \
-  ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
-  echo '📂 Danh sách file trong uploads:' && \
-  ls -R /var/www/public/uploads && \
-  php -S 0.0.0.0:8000 vendor/october/rain/src/Foundation/resources/server.php \
+  echo '📂 Kiểm tra thư mục /var/www/public/uploads:' && \
+  if [ -d /var/www/public/uploads ]; then \
+    if [ \"$(ls -A /var/www/public/uploads)\" ]; then \
+      echo '✅ Danh sách ảnh:' && ls -R /var/www/public/uploads; \
+    else \
+      echo '⚠️  Thư mục uploads tồn tại nhưng rỗng'; \
+    fi; \
+  else \
+    echo '❌ Thư mục /var/www/public/uploads không tồn tại'; \
+  fi && \
+  php -S 0.0.0.0:8000 -t public \
 "]
