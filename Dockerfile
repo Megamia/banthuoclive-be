@@ -50,20 +50,16 @@ EXPOSE 8000
 CMD ["sh", "-c", "\
     echo '📂 Kiểm tra thư mục volume uploads...' && \
     mkdir -p /var/www/storage/app/uploads/public && \
-    if [ -z \"$(ls -A /var/www/storage/app/uploads/public 2>/dev/null)\" ]; then \
-    echo '📥 Volume đang trống, đang copy ảnh mẫu...' && \
+    echo '📥 Đang ép copy ảnh mẫu vào volume...' && \
     if [ -d /var/www/_original_uploads/public ]; then \
     cp -a /var/www/_original_uploads/public/. /var/www/storage/app/uploads/public/ && \
     echo '✅ Đã copy ảnh mẫu vào volume.'; \
     else \
     echo '❌ Không có ảnh mẫu để copy.'; \
     fi; \
-    else \
-    echo '✅ Volume đã có dữ liệu.'; \
-    fi && \
     rm -rf /var/www/uploads && \
     ln -s /var/www/storage/app/uploads/public /var/www/uploads && \
     echo '📂 Danh sách ảnh trong /uploads:' && \
-    ls -R /var/www/uploads || echo '❌ Không có ảnh nào!' && \
+    ls -lR /var/www/uploads || echo '❌ Không có ảnh nào!' && \
     php -S 0.0.0.0:8000 -t . \
     "]
