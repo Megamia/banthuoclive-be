@@ -40,10 +40,11 @@ EXPOSE 8000
 # Run Laravel dev server
 CMD ["sh", "-c", "\
   sleep 10 && \
+  mkdir -p /var/www/public && \
   mkdir -p /var/www/storage/app/uploads/public && \
   rm -rf /var/www/public/uploads && \
   ln -s /var/www/storage/app/uploads/public /var/www/public/uploads && \
   echo '📂 Danh sách file:' && \
   ls -al /var/www/public/uploads && \
-  php -S 0.0.0.0:8000 -t /var/www \
+  php artisan serve --host=0.0.0.0 --port=8000 \
 "]
