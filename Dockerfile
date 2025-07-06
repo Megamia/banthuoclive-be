@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     supervisor \
     gettext-base \
+    iproute2 net-tools \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
 # Cài Composer
@@ -57,8 +58,8 @@ EXPOSE 8000
 CMD sh -c "\
     echo '🚀 Railway cấp PORT = '$PORT; \
     envsubst '\$PORT' < /etc/nginx/sites-available/default.template > /etc/nginx/sites-available/default; \
-    echo '📄 Cấu hình nginx thực tế:'; grep listen /etc/nginx/sites-available/default; \
-    echo '📡 Các cổng đang lắng nghe:'; ss -tulpn || netstat -tulpn; \
-    tail -F /var/log/nginx/error.log /usr/local/var/log/php-fpm.log & \
+    echo '📄 NGINX đang dùng cấu hình:'; grep listen /etc/nginx/sites-available/default; \
+    ss -tulpn || netstat -tulpn || echo '❌ ss/netstat chưa có'; \
     /usr/bin/supervisord -n"
+
 
