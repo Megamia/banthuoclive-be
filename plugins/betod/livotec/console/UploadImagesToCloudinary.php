@@ -50,7 +50,7 @@ class UploadImagesToCloudinary extends Command
                 $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
                 $publicId = 'livotec/' . $filename;
 
-                if ($this->cloudinaryExists($filename)) {
+                if ($this->cloudinaryExists($publicId)) {
                     $skipped[] = $file->getFilename();
                     Log::info("⚠️  Bỏ qua (đã tồn tại): {$publicId}");
                     continue;
@@ -85,7 +85,7 @@ class UploadImagesToCloudinary extends Command
     {
         try {
             $api = new AdminApi();
-            $asset = $api->asset("livotec/{$publicId}");
+            $asset = $api->asset($publicId);
             return !empty($asset);
         } catch (NotFound $e) {
             return false;
