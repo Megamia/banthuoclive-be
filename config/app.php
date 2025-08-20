@@ -160,5 +160,6 @@ return [
     */
 
     'timezone' => 'UTC',
+    'trusted_proxies' => env('TRUSTED_PROXIES', '*'),
 
 ];
