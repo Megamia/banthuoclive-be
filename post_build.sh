@@ -1,11 +1,14 @@
+#!/bin/bash
 
 echo "🚀 Running post-build tasks for OctoberCMS..."
 
-echo "🔧 Setting folder permissions..."
-chmod -R 775 storage
-chmod -R 775 bootstrap/cache
-chmod -R 775 storage/framework
+# Tạo folder nếu chưa có
+mkdir -p storage/framework bootstrap/cache
 
+# Set quyền
+chmod -R 775 storage bootstrap/cache
+
+# Tạo .htaccess nếu chưa có
 HTACCESS_FILE="./.htaccess"
 if [ ! -f "$HTACCESS_FILE" ]; then
     echo "📄 Creating .htaccess for Laravel routing..."
