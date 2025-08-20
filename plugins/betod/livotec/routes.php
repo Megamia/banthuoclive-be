@@ -27,10 +27,15 @@ if (!function_exists('getCloudinaryUrlFromDiskName')) {
             return null;
         }
 
+        // lấy extension + tên file
         $ext = pathinfo($diskName, PATHINFO_EXTENSION);
         $name = pathinfo($diskName, PATHINFO_FILENAME);
 
-        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
+        // build public_id: folder/name
+        $publicId = $folder . '/' . $name;
+
+        // Cloudinary URL chuẩn (bỏ qua version để tránh 404)
+        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$publicId}.{$ext}";
     }
 }
 

@@ -15,7 +15,7 @@ class Plugin extends PluginBase
      */
     public function register()
     {
-        $this->registerConsoleCommand('livotec.upload-images', \Betod\Livotec\Console\UploadImagesToCloudinary::class);
+        $this->registerConsoleCommand('livotec.upload-images', UploadImagesToCloudinary::class);
     }
 
     /**
@@ -26,13 +26,18 @@ class Plugin extends PluginBase
         File::created(function ($file) {
             // Chỉ xử lý file ảnh
             if (in_array($file->content_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
-                $localPath = storage_path('app/uploads/public/' . $file->getDiskPath());
 
-                $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
+                $localPath = $file->getLocalPath(); // ✅ dùng hàm built-in
 
-                if ($cloudUrl) {
-                    // bạn có thể lưu vào custom column hoặc log
-                    \Log::info("🌩 Uploaded to Cloudinary: " . $cloudUrl);
+                if ($localPath && file_exists($localPath)) {
+                    $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
+
+                    if ($cloudUrl) {
+                        // log trong backend + file system
+                        \Log::info("🌩 Uploaded to Cloudinary: " . $cloudUrl);
+                    }
+                } else {
+                    \Log::error("❌ File path not found: " . $file->id);
                 }
             }
         });
