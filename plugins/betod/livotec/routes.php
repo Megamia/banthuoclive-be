@@ -10,47 +10,47 @@ use Betod\Livotec\Controllers\PayPalController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
-// if (!function_exists('imagePathToRelative')) {
-//     function imagePathToRelative($diskName)
-//     {
-//         return substr($diskName, 0, 3) . '/' . substr($diskName, 3, 3) . '/' . substr($diskName, 6, 3) . '/' . $diskName;
-//     }
-// }
+if (!function_exists('imagePathToRelative')) {
+    function imagePathToRelative($diskName)
+    {
+        return substr($diskName, 0, 3) . '/' . substr($diskName, 3, 3) . '/' . substr($diskName, 6, 3) . '/' . $diskName;
+    }
+}
 
-// if (!function_exists('getCloudinaryUrlFromDiskName')) {
-//     function getCloudinaryUrlFromDiskName($diskName, $folder = 'livotec')
-//     {
-//         $cloudName = config('cloudinary.cloud_name');
+if (!function_exists('getCloudinaryUrlFromDiskName')) {
+    function getCloudinaryUrlFromDiskName($diskName, $folder = 'livotec')
+    {
+        $cloudName = config('cloudinary.cloud_name');
 
-//         if (!$cloudName) {
-//             \Log::warning("⚠️ Không lấy được cloud_name từ config.");
-//             return null;
-//         }
+        if (!$cloudName) {
+            \Log::warning("⚠️ Không lấy được cloud_name từ config.");
+            return null;
+        }
 
-//         $ext = pathinfo($diskName, PATHINFO_EXTENSION);
-//         $name = pathinfo($diskName, PATHINFO_FILENAME);
+        $ext = pathinfo($diskName, PATHINFO_EXTENSION);
+        $name = pathinfo($diskName, PATHINFO_FILENAME);
 
-//         return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
-//     }
-// }
+        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
+    }
+}
 
 
-// if (!function_exists('attachCloudinaryUrlToProduct')) {
-//     function attachCloudinaryUrlToProduct($product)
-//     {
-//         if ($product->image) {
-//             $product->image->cloudinary_url = getCloudinaryUrlFromDiskName($product->image->disk_name);
-//         }
+if (!function_exists('attachCloudinaryUrlToProduct')) {
+    function attachCloudinaryUrlToProduct($product)
+    {
+        if ($product->image) {
+            $product->image->cloudinary_url = getCloudinaryUrlFromDiskName($product->image->disk_name);
+        }
 
-//         if ($product->gallery) {
-//             foreach ($product->gallery as $img) {
-//                 $img->cloudinary_url = getCloudinaryUrlFromDiskName($img->disk_name);
-//             }
-//         }
+        if ($product->gallery) {
+            foreach ($product->gallery as $img) {
+                $img->cloudinary_url = getCloudinaryUrlFromDiskName($img->disk_name);
+            }
+        }
 
-//         return $product;
-//     }
-// }
+        return $product;
+    }
+}
 
 Route::group(['prefix' => 'apiProduct'], function () {
     // Route::get("allProduct", function () {
@@ -65,7 +65,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
 
-        // $allProduct->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $allProduct->transform(fn($p) => attachCloudinaryUrlToProduct($p));
 
         return response()->json([
             'allProduct' => $allProduct,
@@ -85,7 +85,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
             ->whereIn('category_id', $categoryIds)
             ->get();
 
-        // $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
 
         return response()->json([
             'category' => $category,
@@ -105,7 +105,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
             ->where('category_id', $category->id)
             ->get();
 
-        // $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
 
         return $products;
     });
@@ -117,8 +117,8 @@ Route::group(['prefix' => 'apiProduct'], function () {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        return ($product);
-        // return attachCloudinaryUrlToProduct($product);
+        // return ($product);
+        return attachCloudinaryUrlToProduct($product);
     });
 });
 
