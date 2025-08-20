@@ -20,22 +20,19 @@ if (!function_exists('imagePathToRelative')) {
 if (!function_exists('getCloudinaryUrlFromDiskName')) {
     function getCloudinaryUrlFromDiskName($diskName, $folder = 'livotec')
     {
-        $cloudName = config('cloudinary.cloud_name');
+        $cloudName = config('cloudinary.cloud_url')
+            ? parse_url(config('cloudinary.cloud_url'), PHP_URL_HOST)
+            : env('CLOUDINARY_CLOUD_NAME');
 
         if (!$cloudName) {
             \Log::warning("⚠️ Không lấy được cloud_name từ config.");
             return null;
         }
 
-        // lấy extension + tên file
         $ext = pathinfo($diskName, PATHINFO_EXTENSION);
         $name = pathinfo($diskName, PATHINFO_FILENAME);
 
-        // build public_id: folder/name
-        $publicId = $folder . '/' . $name;
-
-        // Cloudinary URL chuẩn (bỏ qua version để tránh 404)
-        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$publicId}.{$ext}";
+        return "https://res.cloudinary.com/{$cloudName}/image/upload/{$folder}/{$name}.{$ext}";
     }
 }
 
