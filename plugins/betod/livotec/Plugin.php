@@ -33,10 +33,6 @@ class Plugin extends PluginBase
                     $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
 
                     if ($cloudUrl) {
-                        // nếu muốn lưu lại url trong DB
-                        $file->cloudinary_url = $cloudUrl;
-                        $file->saveQuietly();
-
                         \Log::info("🌩 Uploaded to Cloudinary: {$cloudUrl}");
                     }
                 } else {
