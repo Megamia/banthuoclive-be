@@ -23,30 +23,29 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
-        File::extend(function ($model) {
-            $model->bindEvent('model.afterSave', function () use ($model) {
-                // Chỉ xử lý file ảnh
-                if (in_array($model->content_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+        File::created(function ($file) {
+            // chỉ xử lý file ảnh
+            if (in_array($file->content_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
 
-                    $localPath = $model->getLocalPath();
+                $localPath = $file->getLocalPath();
 
-                    if ($localPath && file_exists($localPath)) {
-                        $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
+                if ($localPath && file_exists($localPath)) {
+                    $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
 
-                        if ($cloudUrl) {
-                            // Nếu muốn lưu lại URL
-                            $model->cloudinary_url = $cloudUrl;
-                            $model->saveQuietly();
+                    if ($cloudUrl) {
+                        // nếu muốn lưu lại url trong DB
+                        $file->cloudinary_url = $cloudUrl;
+                        $file->saveQuietly();
 
-                            \Log::info("🌩 Uploaded to Cloudinary: " . $cloudUrl);
-                        }
-                    } else {
-                        \Log::error("❌ File path not found: " . $model->id);
+                        \Log::info("🌩 Uploaded to Cloudinary: {$cloudUrl}");
                     }
+                } else {
+                    \Log::error("❌ File path not found: {$file->id}");
                 }
-            });
+            }
         });
     }
+
 
     /**
      * registerComponents used by the frontend.
