@@ -11,7 +11,7 @@ use Cloudinary\Api\Exception\NotFound;
 
 class UploadImagesToCloudinary extends Command
 {
-    protected $name = 'livotec:upload-images';
+    protected $signature = 'livotec:upload-images {--only-new : Chỉ upload ảnh mới chưa có trên Cloudinary}';
 
     protected $description = 'Upload toàn bộ ảnh từ storage/app/uploads/public lên Cloudinary (folder livotec)';
 
@@ -50,7 +50,8 @@ class UploadImagesToCloudinary extends Command
                 $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
                 $publicId = 'livotec/' . $filename;
 
-                if ($this->cloudinaryExists($publicId)) {
+                // Nếu chọn --only-new thì bỏ qua file đã tồn tại
+                if ($this->option('only-new') && $this->cloudinaryExists($publicId)) {
                     $skipped[] = $file->getFilename();
                     Log::info("⚠️  Bỏ qua (đã tồn tại): {$publicId}");
                     continue;
@@ -81,6 +82,9 @@ class UploadImagesToCloudinary extends Command
         return 0;
     }
 
+    /**
+     * Kiểm tra ảnh đã tồn tại trên Cloudinary chưa
+     */
     private function cloudinaryExists($publicId)
     {
         try {
@@ -92,6 +96,27 @@ class UploadImagesToCloudinary extends Command
         } catch (\Exception $e) {
             Log::error("❗ Lỗi kiểm tra Cloudinary [{$publicId}]: " . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Hàm dùng cho upload ngay khi có file mới
+     */
+    public static function uploadSingle(string $filePath)
+    {
+        try {
+            $filename = pathinfo($filePath, PATHINFO_FILENAME);
+            $result = Cloudinary::upload($filePath, [
+                'public_id' => $filename,
+                'folder' => 'livotec',
+            ]);
+
+            Log::info("✅ Upload ngay lập tức: {$filePath} → " . $result->getSecurePath());
+
+            return $result->getSecurePath();
+        } catch (\Exception $e) {
+            Log::error("❌ Lỗi upload ngay lập tức [{$filePath}]: " . $e->getMessage());
+            return null;
         }
     }
 }

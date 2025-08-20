@@ -2,6 +2,8 @@
 namespace Betod\Livotec;
 
 use System\Classes\PluginBase;
+use System\Models\File;
+use Betod\Livotec\Console\UploadImagesToCloudinary;
 
 /**
  * Plugin class
@@ -21,6 +23,19 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
+        File::created(function ($file) {
+            // Chỉ xử lý file ảnh
+            if (in_array($file->content_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+                $localPath = storage_path('app/uploads/public/' . $file->getDiskPath());
+
+                $cloudUrl = UploadImagesToCloudinary::uploadSingle($localPath);
+
+                if ($cloudUrl) {
+                    // bạn có thể lưu vào custom column hoặc log
+                    \Log::info("🌩 Uploaded to Cloudinary: " . $cloudUrl);
+                }
+            }
+        });
     }
 
     /**
