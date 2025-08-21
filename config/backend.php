@@ -86,7 +86,13 @@ return [
     |
     */
 
-    'force_secure' => true,
+    //CHẠY LOCAL
+    'force_secure' => false,
+    //CHẠY LOCAL
+
+    //CHẠY DEPLOY
+    //'force_secure' => true,
+    //CHẠY LOCAL
 
     /*
     |--------------------------------------------------------------------------
