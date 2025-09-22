@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'apiUser/*', 'sanctum/csrf-cookie'],
 
     'allowed_origins' => [
         'https://banthuoclive-fe.vercel.app',
