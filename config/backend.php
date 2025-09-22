@@ -87,11 +87,11 @@ return [
     */
 
     //CHẠY LOCAL
-    'force_secure' => false,
+    // 'force_secure' => false,
     //CHẠY LOCAL
 
     //CHẠY DEPLOY
-    //'force_secure' => true,
+    'force_secure' => true,
     //CHẠY LOCAL
 
     /*
