@@ -27,7 +27,10 @@ Route::group(['prefix' => 'apiUser'], function () {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => [
+                'required',
+                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
+            ],
             'province' => 'nullable|integer',
             'district' => 'nullable|integer',
             'subdistrict' => 'nullable|integer',
@@ -84,14 +87,14 @@ Route::group(['prefix' => 'apiUser'], function () {
             'new_password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
         ]);
 
-        // Kiểm tra mật khẩu cũ
         if (!Hash::check($validated['old_password'], $user->password)) {
-            return response()->json(['error' => 'Mật khẩu cũ không chính xác!'], 422);
+            return response()->json(['status' => 0, 'error' => 'Mật khẩu cũ không chính xác!']);
         }
         $user->password = $validated['new_password'];
         $user->save();
         \Log::info("User ID {$user->id} đã đổi mật khẩu.", ['user_id' => $user->id]);
         return response()->json([
+            'status' => 1,
             'message' => 'Đổi mật khẩu thành công!',
             'user' => [
                 'id' => $user->id,

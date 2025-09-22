@@ -183,3 +183,57 @@ v1.0.67:
 v1.0.68:
     - 'Created table betod_livotec_revenue'
     - builder_table_create_betod_livotec_revenue.php
+v1.0.69:
+    - 'Created table betod_livotec_doctor'
+    - builder_table_create_betod_livotec_doctor.php
+v1.0.70:
+    - 'Created table betod_livotec_specialties'
+    - builder_table_create_betod_livotec_specialties.php
+v1.0.71:
+    - 'Updated table betod_livotec_specialties'
+    - builder_table_update_betod_livotec_specialties.php
+v1.0.72:
+    - 'Updated table betod_livotec_doctor'
+    - builder_table_update_betod_livotec_doctor.php
+v1.0.73:
+    - 'Updated table betod_livotec_specialties'
+    - builder_table_update_betod_livotec_specialties_2.php
+v1.0.74:
+    - 'Updated table betod_livotec_specialties'
+    - builder_table_update_betod_livotec_specialties_3.php
+v1.0.75:
+    - 'Updated table betod_livotec_doctor'
+    - builder_table_update_betod_livotec_doctor_2.php
+v1.0.76:
+    - 'Updated table betod_livotec_doctor'
+    - builder_table_update_betod_livotec_doctor_3.php
+v1.0.77:
+    - 'Created table betod_livotec_schedules'
+    - builder_table_create_betod_livotec_schedules.php
+v1.0.78:
+    - 'Updated table betod_livotec_schedules'
+    - builder_table_update_betod_livotec_schedules.php
+v1.0.79:
+    - 'Updated table betod_livotec_schedules'
+    - builder_table_update_betod_livotec_schedules_2.php
+v1.0.80:
+    - 'Updated table betod_livotec_schedules'
+    - builder_table_update_betod_livotec_schedules_3.php
+v1.0.81:
+    - 'Updated table betod_livotec_schedules'
+    - builder_table_update_betod_livotec_schedules_4.php
+v1.0.82:
+    - 'Created table betod_livotec_appointment'
+    - builder_table_create_betod_livotec_appointment.php
+v1.0.83:
+    - 'Updated table betod_livotec_appointment'
+    - builder_table_update_betod_livotec_appointment.php
+v1.0.84:
+    - 'Updated table betod_livotec_appointment'
+    - builder_table_update_betod_livotec_appointment_2.php
+v1.0.85:
+    - 'Updated table betod_livotec_appointment'
+    - builder_table_update_betod_livotec_appointment_3.php
+v1.0.86:
+    - 'Updated table betod_livotec_appointment'
+    - builder_table_update_betod_livotec_appointment_4.php

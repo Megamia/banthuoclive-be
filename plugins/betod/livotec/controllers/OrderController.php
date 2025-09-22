@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Betod\Livotec\Controllers\GhnController;
 
 class OrderController extends Controller
@@ -28,14 +29,20 @@ class OrderController extends Controller
         $validatedData = $request->validate([
             'user_id' => 'nullable|integer',
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => [
+                'required',
+                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
+            ],
             'email' => 'required|email|max:255',
             'province' => 'required|integer',
             'district' => 'required|integer',
             'subdistrict' => 'required|integer',
             'address' => 'required|string|max:500',
             'diffname' => 'nullable|string|max:255',
-            'diffphone' => 'nullable|string|max:20',
+            'diffphone' => [
+                'nullable',
+                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
+            ],
             'diffprovince' => 'nullable|integer',
             'diffdistrict' => 'nullable|integer',
             'diffsubdistrict' => 'nullable|integer',
@@ -50,6 +57,8 @@ class OrderController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
+        // \Log::info("Validated data: ", $validatedData);
+
         $totalPrice = array_reduce($validatedData['items'], function ($sum, $item) {
             return $sum + $item['price'] * $item['quantity'];
         }, 0);
@@ -57,84 +66,85 @@ class OrderController extends Controller
         $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
         $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
 
-        $order = Orders::create([
-            'user_id' => $validatedData['user_id'] ?? null,
-            'order_code' => $orderCode,
-            'price' => $totalPrice,
-            'property' => $propertyData,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        foreach ($validatedData['items'] as $item) {
-            OrderDetail::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'price' => ($item['price'] * $item['quantity']),
+            $ghnItems = collect($validatedData['items'])->map(function ($item) {
+                $product = Product::find($item['product_id']);
+                return [
+                    'name' => $product->name ?? 'Unknown Product',
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'] * $item['quantity'],
+                ];
+            })->toArray();
+
+            // \Log::info("Creating GHN order for order_code: {$orderCode}");
+
+            $ghnResponse = $this->createGhnOrderForItems($validatedData, $ghnItems, $orderCode);
+
+            // \Log::info("GHN Response: ", $ghnResponse);
+
+            if (!isset($ghnResponse['code']) || $ghnResponse['code'] !== 200) {
+                DB::rollBack();
+                return response()->json([
+                    'code' => 400,
+                    'message' => $ghnResponse['message'] ?? 'Tạo đơn hàng thất bại GHN'
+                ], 400);
+            }
+
+            $order = Orders::create([
+                'user_id' => $validatedData['user_id'] ?? null,
+                'order_code' => $orderCode,
+                'price' => $totalPrice,
+                'property' => $propertyData,
+                'ghn_order_code' => $ghnResponse['data']['order_code'] ?? 'DEFAULT_CODE'
             ]);
 
-            $product = Product::find($item['product_id']);
-            if ($product) {
-                $product->stock = max(0, $product->stock - $item['quantity']);
-                $product->sold_out += $item['quantity'];
-                $product->save();
+            foreach ($validatedData['items'] as $item) {
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'] * $item['quantity'],
+                ]);
+
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $product->stock = max(0, $product->stock - $item['quantity']);
+                    $product->sold_out += $item['quantity'];
+                    $product->save();
+                }
             }
+
+            DB::commit();
+
+            UpdateOrderStatusJob::dispatch($order->id)->delay(now()->addMinutes(5));
+
+            return response()->json([
+                'message' => 'Order created successfully!',
+                'order_code' => $order->order_code,
+                'ghn_order_code' => $order->ghn_order_code,
+                'data' => $order,
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error creating order: ' . $e->getMessage());
+            return response()->json([
+                'code' => 500,
+                'message' => 'Lỗi hệ thống, tạo đơn không thành công.'
+            ], 500);
         }
-
-        $ghnResponse = $this->createGhnOrder($order);
-
-        if (is_array($ghnResponse) && isset($ghnResponse['code']) && $ghnResponse['code'] === 200) {
-            $order->ghn_order_code = $ghnResponse['data']['order_code'] ?? 'DEFAULT_CODE';
-            $order->save();
-        } elseif ($ghnResponse instanceof JsonResponse) {
-            $responseData = $ghnResponse->getData(true);
-            if (isset($responseData['message'])) {
-                return response()->json(['code' => 400, 'message' => $responseData['message']], 400);
-            }
-        } else {
-            return response()->json(['code' => 400, 'message' => 'Tạo đơn hàng thất bại. Vui lòng thử lại sau.'], 400);
-        }
-
-        UpdateOrderStatusJob::dispatch($order->id)->delay(now()->addMinutes(5));
-
-        return response()->json([
-            'message' => 'Order created successfully!',
-            'order_code' => $order->order_code,
-            'ghn_order_code' => $ghnResponse['data']['order_code'] ?? 'DEFAULT_CODE',
-            'data' => $order,
-        ], 201);
     }
 
-
-    private function isValidShippingArea($provinceId, $districtId, $subdistrictId)
+    private function createGhnOrderForItems($validatedData, $items, $orderCode)
     {
-        $province = $this->ghn->findProvinceById($provinceId);
-        if (!$province) {
-            return false;
-        }
-
-        $district = $this->ghn->findDistrictById($provinceId, $districtId);
-        if (!$district) {
-            return false;
-        }
-
-        $wardCode = $this->ghn->findWardCodeById($districtId, $subdistrictId);
-        if (!$wardCode) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function createGhnOrder($order)
-    {
-        $property = $order->property;
-
-        $provinceId = (int) trim($property['province']);
-        $districtId = (int) trim($property['district']);
-        $subdistrictId = (int) trim($property['subdistrict']);
+        $provinceId = (int) trim($validatedData['province']);
+        $districtId = (int) trim($validatedData['district']);
+        $subdistrictId = (int) trim($validatedData['subdistrict']);
 
         if (!$this->isValidShippingArea($provinceId, $districtId, $subdistrictId)) {
-            return response()->json(['code' => 400, 'message' => 'Invalid shipping area'], 400);
+            return ['code' => 400, 'message' => 'Invalid shipping area'];
         }
 
         $provinceID = $this->ghn->findProvinceById($provinceId);
@@ -150,18 +160,8 @@ class OrderController extends Controller
         $senderWardCode = $this->ghn->findWardCodeById($senderDistrictID, $senderWardId);
 
         if (!$senderProvinceID || !$senderDistrictID || !$senderWardCode) {
-            return response()->json(['code' => 400, 'message' => 'Sender address invalid'], 400);
+            return ['code' => 400, 'message' => 'Sender address invalid'];
         }
-
-        $orderDetails = OrderDetail::where('order_id', $order->id)->get();
-        $items = $orderDetails->map(function ($item) {
-            $product = Product::find($item->product_id);
-            return [
-                'name' => $product->name ?? 'Unknown Product',
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-            ];
-        })->toArray();
 
         $apiKey = env('GHN_API_KEY');
 
@@ -169,23 +169,23 @@ class OrderController extends Controller
             'Token' => $apiKey,
             'Content-Type' => 'application/json',
         ])->post('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create', [
-                    'payment_type_id' => $property['paymenttype'] ?? null,
-                    'note' => $property['notes'] ?? '',
-                    'to_name' => $property['name'],
-                    'to_phone' => $property['phone'],
-                    'to_address' => $property['address'],
+                    'payment_type_id' => $validatedData['paymenttype'] ?? null,
+                    'note' => $validatedData['notes'] ?? '',
+                    'to_name' => $validatedData['name'],
+                    'to_phone' => $validatedData['phone'],
+                    'to_address' => $validatedData['address'],
                     'to_ward_code' => $wardCode,
                     'to_district_id' => $districtID,
                     'to_province_id' => $provinceID,
-                    'required_note' => 'CHOXEMHANGKHONGTHU',
+                    'required_note' => 'Cho xem hàng',
                     'from_name' => 'Megami Shop',
                     'from_phone' => '0869208950',
                     'from_address' => 'Hà Nội',
                     'from_ward_code' => $senderWardCode,
                     'from_district_id' => $senderDistrictID,
                     'from_province_id' => $senderProvinceID,
-                    'client_order_code' => $order->order_code,
-                    'cod_amount' => $order->price,
+                    'client_order_code' => $orderCode,
+                    'cod_amount' => array_reduce($items, fn($sum, $i) => $sum + $i['price'], 0),
                     'weight' => 500,
                     'length' => 30,
                     'width' => 20,
@@ -195,14 +195,26 @@ class OrderController extends Controller
                 ]);
 
         if ($response->failed()) {
-            return response()->json([
-                'code' => 400,
-                'message' => 'Khu vực này hiện tại đang quá tải không thể tạo đơn, mong quý khách thông cảm và tạo lại sau!'
-            ], 400);
+            return ['code' => 400, 'message' => 'Khu vực hiện tại đang quá tải, vui lòng thử lại sau!'];
         }
-        \Log::info("response: ", $response->json());
-
 
         return $response->json();
+    }
+
+    private function isValidShippingArea($provinceId, $districtId, $subdistrictId)
+    {
+        $province = $this->ghn->findProvinceById($provinceId);
+        if (!$province)
+            return false;
+
+        $district = $this->ghn->findDistrictById($provinceId, $districtId);
+        if (!$district)
+            return false;
+
+        $wardCode = $this->ghn->findWardCodeById($districtId, $subdistrictId);
+        if (!$wardCode)
+            return false;
+
+        return true;
     }
 }

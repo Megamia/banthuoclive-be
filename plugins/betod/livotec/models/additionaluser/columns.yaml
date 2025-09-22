@@ -1,0 +1,4 @@
+columns:
+    address:
+        label: 'Địa chỉ'
+        type: text

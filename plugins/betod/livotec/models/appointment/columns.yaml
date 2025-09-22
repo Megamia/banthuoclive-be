@@ -1,0 +1,22 @@
+columns:
+    queue_number:
+        label: 'Số thứ tự khám'
+        type: number
+    id:
+        label: ID
+        type: number
+    'doctor[name]':
+        label: 'Bác sĩ'
+        type: text
+    'user[email]':
+        label: 'Bệnh nhân'
+        type: text
+    meeting_time:
+        label: 'Thời gian khám'
+        type: datetime
+    created_at:
+        label: 'Thời gian tạo lịch'
+        type: datetime
+    updated_at:
+        label: 'Thời gian cập nhật lịch'
+        type: datetime

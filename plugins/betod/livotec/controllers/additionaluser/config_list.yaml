@@ -1,0 +1,12 @@
+list: $/betod/livotec/models/additionaluser/columns.yaml
+modelClass: Betod\Livotec\Models\AdditionalUser
+title: AdditionalUser
+noRecordsMessage: 'backend::lang.list.no_records'
+showSetup: true
+showCheckboxes: true
+recordsPerPage: 20
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'backend::lang.list.search_prompt'
+recordUrl: 'betod/livotec/additionaluser/update/:id'

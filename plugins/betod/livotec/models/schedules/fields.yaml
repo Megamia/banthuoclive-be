@@ -1,0 +1,35 @@
+fields:
+    id:
+        label: ID
+        span: auto
+        disabled: 1
+        type: number
+    doctor:
+        label: 'Bác sĩ'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        type: relation
+    day_of_week:
+        label: Thứ
+        options:
+            - 'Chủ Nhật'
+            - 'Thứ 2'
+            - 'Thứ 3'
+            - 'Thứ 4'
+            - 'Thứ 5'
+            - 'Thứ 6'
+            - 'Thứ 7'
+        showSearch: true
+        span: full
+        type: dropdown
+    start_time:
+        label: 'Thời gian bắt đầu'
+        mode: time
+        span: left
+        type: datepicker
+    end_time:
+        label: 'Thời gian kết thúc'
+        mode: time
+        span: auto
+        type: datepicker

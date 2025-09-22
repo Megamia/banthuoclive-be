@@ -1,0 +1,22 @@
+fields:
+    queue_number:
+        label: 'Số thứ tự khám'
+        span: auto
+        type: number
+    doctor:
+        label: 'Bác sĩ'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        type: relation
+    user:
+        label: 'Bệnh nhân'
+        nameFrom: name
+        descriptionFrom: description
+        span: auto
+        type: relation
+    meeting_time:
+        label: 'Thời gian khám'
+        mode: datetime
+        span: auto
+        type: datepicker

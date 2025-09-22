@@ -1,0 +1,6 @@
+plugin:
+    name: 'dat.appointment::lang.plugin.name'
+    description: 'dat.appointment::lang.plugin.description'
+    author: dat
+    icon: oc-icon-calendar-o
+    homepage: ''

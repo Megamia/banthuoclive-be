@@ -1,0 +1,5 @@
+fields:
+    address:
+        label: 'Địa chỉ'
+        span: auto
+        type: text

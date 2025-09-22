@@ -1,0 +1,12 @@
+list: $/betod/livotec/models/schedules/columns.yaml
+modelClass: Betod\Livotec\Models\Schedules
+title: Schedules
+noRecordsMessage: 'backend::lang.list.no_records'
+showSetup: true
+showCheckboxes: true
+recordsPerPage: 20
+toolbar:
+    buttons: list_toolbar
+    search:
+        prompt: 'backend::lang.list.search_prompt'
+recordUrl: 'betod/livotec/schedules/update/:id'

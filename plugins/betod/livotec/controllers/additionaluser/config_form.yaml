@@ -1,0 +1,10 @@
+name: AdditionalUser
+form: $/betod/livotec/models/additionaluser/fields.yaml
+modelClass: Betod\Livotec\Models\AdditionalUser
+defaultRedirect: betod/livotec/additionaluser
+create:
+    redirect: 'betod/livotec/additionaluser/update/:id'
+    redirectClose: betod/livotec/additionaluser
+update:
+    redirect: betod/livotec/additionaluser
+    redirectClose: betod/livotec/additionaluser

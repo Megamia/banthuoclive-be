@@ -1,12 +1,16 @@
 <?php
 
+use Betod\Livotec\Controllers\AppointmentController;
 use Betod\Livotec\Controllers\GhnController;
+use Betod\Livotec\Models\Doctor;
 use Betod\Livotec\Models\IngredientsAndInstructions;
 use Betod\Livotec\Models\Orders;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
 use Betod\Livotec\Controllers\PayPalController;
 // use Betod\Livotec\Controllers\UploadController;
+use Betod\Livotec\Models\Schedules;
+use Betod\Livotec\Models\Specialties;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -165,6 +169,59 @@ Route::group(['prefix' => 'apiOrder'], function () {
         }
     });
 });
+
+Route::group(['prefix' => 'apiAppointment'], function () {
+    Route::get("specialties", function () {
+        $specialties = Specialties::all();
+
+        if ($specialties->isEmpty()) {
+            return response()->json([
+                'status' => 0,
+                'specialties' => 'No data',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'specialties' => $specialties,
+        ]);
+    });
+
+    Route::get("specialties/{specialtyId}/doctors", function ($specialtyId) {
+        $doctors = Doctor::where('specialties_id', $specialtyId)->get();
+        if ($doctors->isEmpty()) {
+            return response()->json([
+                'status' => 0,
+                'doctors' => 'No data',
+            ]);
+        }
+        return response()->json([
+            'status' => 1,
+            'doctors' => $doctors,
+        ]);
+    });
+
+    Route::get("doctors/{doctorId}/schedules", function ($doctorId) {
+        $schedules = Schedules::where('doctor_id', $doctorId)
+            ->orderBy('day_of_week', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
+        if ($schedules->isEmpty()) {
+            return response()->json([
+                'status' => 0,
+                'schedules' => 'No data',
+            ]);
+        }
+        return response()->json([
+            'status' => 1,
+            'schedules' => $schedules,
+        ]);
+    });
+    Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
+});
+
+
+
 
 Route::group(['prefix' => 'apiPaypal'], function () {
     Route::post('createOrder', [PayPalController::class, 'createOrder']);

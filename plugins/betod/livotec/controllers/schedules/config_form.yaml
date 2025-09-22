@@ -1,0 +1,10 @@
+name: Schedules
+form: $/betod/livotec/models/schedules/fields.yaml
+modelClass: Betod\Livotec\Models\Schedules
+defaultRedirect: betod/livotec/schedules
+create:
+    redirect: 'betod/livotec/schedules/update/:id'
+    redirectClose: betod/livotec/schedules
+update:
+    redirect: betod/livotec/schedules
+    redirectClose: betod/livotec/schedules

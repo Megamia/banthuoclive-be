@@ -10,30 +10,40 @@ function handleProductFind($message)
 {
     $keyword = trim(str_replace('tìm kiếm', '', $message));
     if (empty($keyword)) {
-        return response()->json(['reply' => 'Vui lòng nhập từ khóa sản phẩm cần tìm kiếm.']);
+        return response()->json([
+            'reply' => 'Vui lòng nhập từ khóa sản phẩm cần tìm kiếm.',
+            'products' => []
+        ]);
     }
 
     $products = Cache::remember("find_product_$keyword", 600, function () use ($keyword) {
         $category = Category::where('name', 'LIKE', "%$keyword%")->first();
-        return $category ? Product::where('category_id', $category->id)->get() : Product::where('name', 'LIKE', "%$keyword%")->get();
+        return $category
+            ? Product::where('category_id', $category->id)->get()
+            : Product::where('name', 'LIKE', "%$keyword%")->get();
     });
 
     if ($products->isNotEmpty()) {
-        $products=$products->sortBy('price');
-        $reply = "🔍 Danh sách sản phẩm phù hợp:\n";
-        foreach ($products as $index => $product) {
-            $reply .= sprintf(
-                "%d. %s\n💰 Giá: %s VNĐ\n📦 Còn: %d cái.\n===========================\n",
-                $index + 1,
-                $product->name,
-                number_format($product->price ?? 0),
-                $product->stock
-            );
-        }
-        return response()->json(['reply' => $reply]);
+        $products = $products->sortBy('price');
+
+        return response()->json([
+            'reply' => 'Danh sách sản phẩm phù hợp:',
+            'products' => $products->map(function ($product, $index) {
+                return [
+                    'index' => $index + 1,
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price ?? 0,
+                    'stock' => $product->stock,
+                ];
+            })->values()
+        ]);
     }
 
-    return response()->json(['reply' => 'Xin lỗi, không tìm thấy sản phẩm phù hợp.']);
+    return response()->json([
+        'reply' => 'Xin lỗi, không tìm thấy sản phẩm phù hợp.',
+        'products' => []
+    ]);
 }
 
 function callGeminiAPI($message)

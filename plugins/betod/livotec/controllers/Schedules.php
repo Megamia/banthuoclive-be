@@ -4,7 +4,7 @@ use Backend;
 use BackendMenu;
 use Backend\Classes\Controller;
 
-class OrderDetail extends Controller
+class Schedules extends Controller
 {
     public $implement = [
         \Backend\Behaviors\FormController::class,
@@ -17,7 +17,7 @@ class OrderDetail extends Controller
     public function __construct()
     {
         parent::__construct();
-        BackendMenu::setContext('Betod.Livotec', 'main-menu-item', 'orderDetail');
+        BackendMenu::setContext('Betod.Livotec', 'doctor', 'schedules');
     }
 
 }

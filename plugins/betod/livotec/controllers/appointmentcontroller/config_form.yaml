@@ -1,0 +1,10 @@
+name: AppointmentController
+form: $/betod/livotec/models/appointment/fields.yaml
+modelClass: Betod\Livotec\Models\Appointment
+defaultRedirect: betod/livotec/appointmentcontroller
+create:
+    redirect: 'betod/livotec/appointmentcontroller/update/:id'
+    redirectClose: betod/livotec/appointmentcontroller
+update:
+    redirect: betod/livotec/appointmentcontroller
+    redirectClose: betod/livotec/appointmentcontroller

@@ -1,0 +1,10 @@
+name: Specialties
+form: $/betod/livotec/models/specialties/fields.yaml
+modelClass: Betod\Livotec\Models\Specialties
+defaultRedirect: betod/livotec/specialties
+create:
+    redirect: 'betod/livotec/specialties/update/:id'
+    redirectClose: betod/livotec/specialties
+update:
+    redirect: betod/livotec/specialties
+    redirectClose: betod/livotec/specialties

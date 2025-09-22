@@ -1,0 +1,25 @@
+tabs:
+    fields:
+        specialties:
+            label: "Chuyên khoa"
+            nameFrom: name
+            descriptionFrom: description
+            span: full
+            type: relation
+            tab: "Chuyên khoa"
+        schedules:
+            label: "Lịch làm việc"
+            type: partial
+            path: ~/plugins/betod/livotec/models/doctor/_schedules.htm
+            tab: "Lịch làm việc"
+
+fields:
+    id:
+        label: ID
+        span: auto
+        disabled: 1
+        type: number
+    name:
+        label: Tên
+        span: auto
+        type: text

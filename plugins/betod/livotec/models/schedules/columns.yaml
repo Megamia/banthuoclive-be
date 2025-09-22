@@ -1,0 +1,17 @@
+columns:
+    id:
+        label: ID
+        type: number
+    'doctor[name]':
+        label: 'Bác sĩ'
+        type: text
+    day_of_week:
+        label: Thứ
+        type: partial
+        path: ~/plugins/betod/livotec/models/schedules/_day_of_week.htm
+    start_time:
+        label: 'Bắt đầu'
+        type: time
+    end_time:
+        label: 'Kết thúc'
+        type: time

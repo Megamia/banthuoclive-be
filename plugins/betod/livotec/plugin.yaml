@@ -34,3 +34,32 @@ navigation:
                 label: Revenue
                 url: betod/livotec/revenue
                 icon: icon-signal
+            add:
+                label: Add
+                url: betod/livotec/additionaluser
+                icon: icon-sitemap
+            orderDetail:
+                label: OrderDetail
+                url: betod/livotec/orderdetail
+                icon: icon-sitemap
+    doctor:
+        label: Appointment
+        url: /
+        icon: icon-life-ring
+        sideMenu:
+            doctor:
+                label: Doctor
+                url: betod/livotec/doctor
+                icon: icon-user-md
+            specialties:
+                label: Specialties
+                url: betod/livotec/specialties
+                icon: icon-crosshairs
+            schedules:
+                label: Schedules
+                url: betod/livotec/schedules
+                icon: icon-table
+            appointment:
+                label: Appointment
+                url: betod/livotec/appointmentcontroller
+                icon: icon-sitemap

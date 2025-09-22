@@ -1,0 +1,10 @@
+name: Doctor
+form: $/betod/livotec/models/doctor/fields.yaml
+modelClass: Betod\Livotec\Models\Doctor
+defaultRedirect: betod/livotec/doctor
+create:
+    redirect: 'betod/livotec/doctor/update/:id'
+    redirectClose: betod/livotec/doctor
+update:
+    redirect: betod/livotec/doctor
+    redirectClose: betod/livotec/doctor

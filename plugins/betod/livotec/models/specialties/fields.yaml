@@ -1,0 +1,10 @@
+fields:
+    id:
+        label: ID
+        span: left
+        disabled: 1
+        type: number
+    name:
+        label: 'Tên chuyên khoa'
+        span: auto
+        type: text
