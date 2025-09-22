@@ -13,5 +13,11 @@ return [
     // 'allowed_origins' =>['*'],
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => false,
+    //LOCAL
+    // 'supports_credentials' => false,
+    //LOCAL
+
+    //DEPLOY
+    'supports_credentials' => true,
+    //DEPLOY
 ];
