@@ -15,33 +15,17 @@ Route::group(['prefix' => 'apiUser'], function () {
 
             $user->load('additional_user');
 
-            $firstName = $user->first_name ?? ($user->additional_user->first_name ?? '');
-            $lastName = $user->last_name ?? ($user->additional_user->last_name ?? '');
-
             return response()->json([
                 'id' => $user->id,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
+                'first_name' => $user->additional_user->first_name ?? '',
+                'last_name' => $user->additional_user->last_name ?? '',
                 'email' => $user->email,
                 'additional_user' => $user->additional_user,
-            ], 200);
-
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-            return response()->json(['message' => 'Token expired'], 401);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-            return response()->json(['message' => 'Token invalid'], 401);
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['message' => 'Token not provided'], 401);
+            ]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     });
-
-
-    Route::get('apiUser/test', function () {
-        return response()->json(['ok' => 1]);
-    });
-
 
     Route::post('/change-info', function (Request $request) {
         $user = checkToken($request);
