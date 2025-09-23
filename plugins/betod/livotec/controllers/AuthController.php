@@ -1,5 +1,5 @@
 <?php
-namespace Vdomah\JWTAuth\Controllers;
+namespace Betod\Livotec\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
