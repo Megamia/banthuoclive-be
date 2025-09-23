@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\App;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {

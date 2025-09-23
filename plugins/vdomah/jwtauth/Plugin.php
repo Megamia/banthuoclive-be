@@ -14,6 +14,10 @@ class Plugin extends PluginBase
      * @var array   Require the RainLab.User plugin
      */
     public $require = ['RainLab.User'];
+    public function register()
+    {
+        require __DIR__ . '/routes.php';
+    }
 
     public function registerComponents()
     {
@@ -63,6 +67,5 @@ class Plugin extends PluginBase
                 return [];
             });
         });
-        require __DIR__ . '/routes.php';
     }
 }
