@@ -13,11 +13,14 @@ return [
     // 'allowed_origins' =>['*'],
     'exposed_headers' => [],
     'max_age' => 0,
+
+    'supports_credentials' => app()->environment('local') ? false : true,
+
     //LOCAL
     // 'supports_credentials' => false,
     //LOCAL
 
     //DEPLOY
-    'supports_credentials' => true,
+    // 'supports_credentials' => true,
     //DEPLOY
 ];

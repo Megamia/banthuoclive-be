@@ -38,36 +38,25 @@ Route::group(['prefix' => 'api'], function () {
             'additional_user' => $userModel->additional_user,
             'is_activated' => $userModel->is_activated ?? false,
         ];
+        $user = json_decode(json_encode($user), true);
 
-        //LOCAL
-        // $cookie = cookie(
-        //     name: 'token',
-        //     value: $token,
-        //     minutes: 1440,
-        //     path: '/',
-        //     domain: 'localhost',
-        //     sameSite: 'Lax',
-        //     secure: false,
-        //     httpOnly: true,
-        // );
-        //LOCAL
+        $domain = app()->environment('local') ? 'localhost' : 'banthuoclive-fe.vercel.app';
 
-        //DEPLOY
-        $secure = true;
         $cookie = cookie(
             name: 'token',
             value: $token,
             minutes: 1440,
             path: '/',
-            domain: 'banthuoclive-fe.vercel.app',
-            sameSite: 'None',
-            secure: $secure,
+            domain: $domain,
+            sameSite: app()->environment('local') ? 'Lax' : 'None',
+            secure: !app()->environment('local'),
             httpOnly: true,
         );
-        //DEPLOY
 
         // if no errors are encountered we can return a JWT
-        return response()->json(compact('user'))->cookie(cookie: $cookie);
+        return response()->json([
+            'user' => $user,
+        ])->cookie($cookie);
     });
 
     Route::post('refresh', function (Request $request) {
