@@ -13,6 +13,7 @@ use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Vdomah\JWTAuth\Controllers\AuthController;
 
 if (!function_exists('imagePathToRelative')) {
     function imagePathToRelative($diskName)
@@ -244,4 +245,15 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/provinces', [GhnController::class, 'getProvinces']);
     Route::get('/ghn/districts/{province_id}', [GhnController::class, 'getDistricts']);
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
+});
+
+Route::group(['prefix' => 'api'], function () {
+    Route::get('testabc', [AuthController::class, 'test']);
+
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('check-token', [AuthController::class, 'checkToken']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('invalidate', [AuthController::class, 'invalidate']);
+    Route::post('signup', [AuthController::class, 'signup']);
 });
