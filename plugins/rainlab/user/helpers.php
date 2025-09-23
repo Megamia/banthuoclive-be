@@ -8,26 +8,24 @@ function checkToken(Request $request)
 {
     Log::info('Check token function hit');
 
-    $token = $request->cookie('token');
+    $token = $request->bearerToken();
 
     if (!$token) {
-        Log::error('Token not found in cookie');
-        return response()->json(['message' => 'Token not found'], 205);
+        Log::error('Token not found in header');
+        return response()->json(['message' => 'Token not provided'], 401);
     }
 
     try {
         return JWTAuth::setToken($token)->toUser();
-    } catch (Exception $e) {
-        Log::error('Error validating token: ' . $e->getMessage());
-        $cookie = cookie(
-            name: 'token',
-            value: '',
-            minutes: -1,
-            path: '/',
-            sameSite: 'None',
-            secure: true,
-            httpOnly: true,
-        );
-        return response()->json(['message' => 'Token is invalid or expired'], 204)->cookie($cookie);
+    } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        Log::error('Token expired: ' . $e->getMessage());
+        return response()->json(['message' => 'Token expired'], 401);
+    } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        Log::error('Token invalid: ' . $e->getMessage());
+        return response()->json(['message' => 'Token invalid'], 401);
+    } catch (\Exception $e) {
+        Log::error('JWT Error: ' . $e->getMessage());
+        return response()->json(['message' => 'JWT error'], 500);
     }
 }
+
