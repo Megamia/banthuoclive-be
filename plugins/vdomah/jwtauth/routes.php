@@ -57,7 +57,7 @@ Route::group(['prefix' => 'api'], function () {
             value: $token,
             minutes: 1440,
             path: '/',
-            domain: 'banthuoclive-fe.vercel.app',
+            domain: '.vercel.app',
             sameSite: 'None',
             secure: $secure,
             httpOnly: true,
