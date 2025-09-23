@@ -37,15 +37,33 @@ Route::group(['prefix' => 'api'], function () {
             ];
         }
 
+        //LOCAL
+        // $cookie = cookie(
+        //     name: 'token',
+        //     value: $token,
+        //     minutes: 1440,
+        //     path: '/',
+        //     domain: 'localhost',
+        //     sameSite: 'Lax',
+        //     secure: false,
+        //     httpOnly: true,
+        // );
+        //LOCAL
+
+        //DEPLOY
+        $secure = true;
         $cookie = cookie(
             name: 'token',
             value: $token,
             minutes: 1440,
             path: '/',
-            sameSite: 'Lax',
-            secure: true,
+            domain: '.yourdomain.com',
+            sameSite: 'None',
+            secure: $secure,
             httpOnly: true,
         );
+        //DEPLOY
+        
         // if no errors are encountered we can return a JWT
         return response()->json(compact('user'))->cookie(cookie: $cookie);
     });
