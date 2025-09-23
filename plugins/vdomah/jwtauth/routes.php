@@ -57,13 +57,12 @@ Route::group(['prefix' => 'api'], function () {
             value: $token,
             minutes: 1440,
             path: '/',
-            domain: '.yourdomain.com',
             sameSite: 'None',
             secure: $secure,
             httpOnly: true,
         );
         //DEPLOY
-        
+
         // if no errors are encountered we can return a JWT
         return response()->json(compact('user'))->cookie(cookie: $cookie);
     });
