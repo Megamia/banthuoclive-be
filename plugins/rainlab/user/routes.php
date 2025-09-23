@@ -13,14 +13,17 @@ Route::group(['prefix' => 'apiUser'], function () {
                 return response()->json(['message' => 'User not found'], 404);
             }
 
-            $data = User::with('additional_user')->find($user->id);
+            $user->load('additional_user');
+
+            $firstName = $user->first_name ?? ($user->additional_user->first_name ?? '');
+            $lastName = $user->last_name ?? ($user->additional_user->last_name ?? '');
 
             return response()->json([
-                'id' => $data->id,
-                'first_name' => $data->first_name,
-                'last_name' => $data->last_name,
-                'email' => $data->email,
-                'additional_user' => $data->additional_user,
+                'id' => $user->id,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $user->email,
+                'additional_user' => $user->additional_user,
             ], 200);
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -33,6 +36,7 @@ Route::group(['prefix' => 'apiUser'], function () {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     });
+
 
     Route::get('apiUser/test', function () {
         return response()->json(['ok' => 1]);
