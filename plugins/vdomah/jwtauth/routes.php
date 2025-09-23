@@ -98,17 +98,24 @@ Route::group(['prefix' => 'api'], function () {
     });
 
     Route::post('logout', function (Request $request) {
-        $cookie = cookie(
-            name: 'token',
-            value: '',
-            minutes: -1,
-            path: '/',
-            sameSite: 'None',
-            secure: true,
-            httpOnly: true,
-        );
-        return response()->json(['message' => 'logged_out'])->cookie($cookie);
+        try {
+            $token = $request->bearerToken();
+
+            if ($token) {
+                JWTAuth::invalidate($token); 
+            }
+
+            return response()->json([
+                'message' => 'logged_out'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Logout failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     });
+
 
     Route::post('signup', function (Request $request) {
         if (Settings::get('is_signup_disabled'))
@@ -120,18 +127,15 @@ Route::group(['prefix' => 'api'], function () {
         try {
             $userModel = UserModel::create($credentials);
 
-            if ($userModel->methodExists('getAuthApiSignupAttributes')) {
-                $user = $userModel->getAuthApiSignupAttributes();
-            } else {
-                $user = [
-                    'id' => $userModel->id,
-                    'first_name' => $userModel->first_name,
-                    'surname' => $userModel->surname,
-                    'username' => $userModel->username,
-                    'email' => $userModel->email,
-                    'is_activated' => $userModel->is_activated,
-                ];
-            }
+            $user = [
+                'id' => $userModel->id,
+                'first_name' => $userModel->first_name,
+                'last_name' => $userModel->last_name,
+                'username' => $userModel->username,
+                'email' => $userModel->email,
+                'is_activated' => $userModel->is_activated,
+            ];
+
         } catch (Exception $e) {
             return Response::json(['error' => $e->getMessage()], 401);
         }
