@@ -11,9 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {
-    Route::get("testApi", function () {
-        return response()->json(['message' => 'API login test OK']);
-    });
     Route::post('login', function (Request $request) {
         if (Settings::get('is_login_disabled'))
             App::abort(404, 'Page not found');

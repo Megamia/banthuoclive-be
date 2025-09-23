@@ -6,32 +6,32 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 Route::group(['prefix' => 'apiUser'], function () {
     Route::post('profile', function (Request $request) {
-        $authHeader = $request->header('Authorization');
-
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return response()->json(['message' => 'Token not provided'], 401);
-        }
-
-        $token = substr($authHeader, 7); 
-
         try {
+            $token = $request->bearerToken();
+            if (!$token) {
+                return response()->json(['message' => 'Token not provided'], 401);
+            }
+
             $user = JWTAuth::setToken($token)->toUser();
+            if (!$user) {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+
+            $data = User::with('additional_user')->find($user->id);
+
+            return response()->json([
+                'id' => $data->id,
+                'first_name' => $data->first_name,
+                'last_name' => $data->last_name,
+                'email' => $data->email,
+                'additional_user' => $data->additional_user,
+            ], 200);
+
         } catch (JWTException $e) {
             return response()->json(['message' => 'Token invalid or expired'], 401);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
-
-        $data = User::with(['additional_user'])->find($user->id);
-
-        return response()->json([
-            'id' => $data->id,
-            'first_name' => $data->first_name,
-            'last_name' => $data->last_name,
-            'email' => $data->email,
-            'additional_user' => $data->additional_user,
-        ]);
-    });
-    Route::get("testApiUser", function () {
-        return response()->json(['message' => 'API user test OK']);
     });
 
     Route::post('/change-info', function (Request $request) {
