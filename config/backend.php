@@ -86,14 +86,14 @@ return [
     |
     */
 
-    'force_secure' => app()->environment('local') ? false : true,
+    // 'force_secure' => app()->environment('local') ? false : true,
 
     //CHẠY LOCAL
     // 'force_secure' => false,
     //CHẠY LOCAL
 
     //CHẠY DEPLOY
-    // 'force_secure' => true,
+    'force_secure' => true,
     //CHẠY LOCAL
 
     /*
