@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\App;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Request;
-use Exception;
 use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {
@@ -68,6 +67,7 @@ Route::group(['prefix' => 'api'], function () {
             value: $token,
             minutes: 1440,
             path: '/',
+            domain: 'https://banthuoclive-fe.vercel.app/',
             sameSite: 'None',
             secure: $secure,
             httpOnly: true,
