@@ -29,19 +29,15 @@ Route::group(['prefix' => 'api'], function () {
 
         $userModel = JWTAuth::authenticate($token);
 
-        if ($userModel->methodExists('getAuthApiSigninAttributes')) {
-            $user = $userModel->getAuthApiSigninAttributes();
-            \Log::info('User login:', ['user' => $user]);
-
-        } else {
-            $user = [
-                'id' => $userModel->id,
-                'first_name' => $userModel->first_name,
-                'last_name' => $userModel->last_name,
-                'email' => $userModel->email,
-                'additional_user' => $userModel->additional_user,
-            ];
-        }
+        $user = [
+            'id' => $userModel->id,
+            'first_name' => $userModel->first_name,
+            'last_name' => $userModel->last_name,
+            'email' => $userModel->email,
+            'username' => $userModel->username,
+            'additional_user' => $userModel->additional_user,
+            'is_activated' => $userModel->is_activated ?? false,
+        ];
 
         //LOCAL
         // $cookie = cookie(
