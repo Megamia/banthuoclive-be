@@ -13,7 +13,7 @@ use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
-use Vdomah\JWTAuth\Controllers\AuthController;
+use Betod\Livotec\Controllers\AuthController;
 
 if (!function_exists('imagePathToRelative')) {
     function imagePathToRelative($diskName)
