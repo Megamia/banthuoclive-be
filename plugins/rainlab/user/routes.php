@@ -7,12 +7,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 Route::group(['prefix' => 'apiUser'], function () {
     Route::post('profile', function (Request $request) {
         try {
-            $token = $request->bearerToken();
-            if (!$token) {
-                return response()->json(['message' => 'Token not provided'], 401);
-            }
+            $user = JWTAuth::parseToken()->authenticate();
 
-            $user = JWTAuth::setToken($token)->toUser();
             if (!$user) {
                 return response()->json(['message' => 'User not found'], 404);
             }
@@ -27,12 +23,21 @@ Route::group(['prefix' => 'apiUser'], function () {
                 'additional_user' => $data->additional_user,
             ], 200);
 
-        } catch (JWTException $e) {
-            return response()->json(['message' => 'Token invalid or expired'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expired'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalid'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['message' => 'Token not provided'], 401);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     });
+
+    Route::get('apiUser/test', function () {
+        return response()->json(['ok' => 1]);
+    });
+
 
     Route::post('/change-info', function (Request $request) {
         $user = checkToken($request);
