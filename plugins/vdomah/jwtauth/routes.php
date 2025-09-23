@@ -2,9 +2,19 @@
 
 use RainLab\User\Models\User as UserModel;
 use Vdomah\JWTAuth\Models\Settings;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\App;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {
-
+    Route::get("testApi", function () {
+        return response()->json(['message' => 'API login test OK']);
+    });
     Route::post('login', function (Request $request) {
         if (Settings::get('is_login_disabled'))
             App::abort(404, 'Page not found');

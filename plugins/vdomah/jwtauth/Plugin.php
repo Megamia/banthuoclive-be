@@ -1,4 +1,5 @@
-<?php namespace Vdomah\JWTAuth;
+<?php
+namespace Vdomah\JWTAuth;
 
 use Config;
 use RainLab\User\Models\User;
@@ -22,13 +23,13 @@ class Plugin extends PluginBase
     {
         return [
             'settings' => [
-                'label'       => 'vdomah.jwtauth::lang.settings.page_name',
+                'label' => 'vdomah.jwtauth::lang.settings.page_name',
                 'description' => 'vdomah.jwtauth::lang.settings.page_desc',
-                'category'    => 'vdomah.jwtauth::lang.plugin.name',
-                'icon'        => 'oc-icon-key',
-                'class'       => Settings::class,
-                'order'       => 500,
-                'keywords'    => 'jwt jwtauth',
+                'category' => 'vdomah.jwtauth::lang.plugin.name',
+                'icon' => 'oc-icon-key',
+                'class' => Settings::class,
+                'order' => 500,
+                'keywords' => 'jwt jwtauth',
                 'permissions' => ['vdomah.jwtauth.settings']
             ]
         ];
@@ -40,7 +41,7 @@ class Plugin extends PluginBase
             Config::set('auth', Config::get('vdomah.jwtauth::auth'));
         }
 
-        $this->app->bind(\Illuminate\Auth\AuthManager::class, function($app){
+        $this->app->bind(\Illuminate\Auth\AuthManager::class, function ($app) {
             return new \Illuminate\Auth\AuthManager($app);
         });
 
@@ -57,10 +58,11 @@ class Plugin extends PluginBase
         $this->app['router']->middleware('jwt.auth', '\Tymon\JWTAuth\Middleware\GetUserFromToken');
         $this->app['router']->middleware('jwt.refresh', '\Tymon\JWTAuth\Middleware\RefreshToken');
 
-        User::extend(function($model) {
+        User::extend(function ($model) {
             $model->addDynamicMethod('getAuthApiAttributes', function () {
                 return [];
             });
         });
+        require __DIR__ . '/routes.php';
     }
 }

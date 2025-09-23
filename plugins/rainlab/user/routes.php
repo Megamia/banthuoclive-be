@@ -19,6 +19,10 @@ Route::group(['prefix' => 'apiUser'], function () {
         ];
         return response()->json($userdata);
     });
+    Route::get("testApiUser", function () {
+        return response()->json(['message' => 'API user test OK']);
+    });
+
     Route::post('/change-info', function (Request $request) {
         $user = checkToken($request);
         if ($user instanceof \Illuminate\Http\JsonResponse) {
