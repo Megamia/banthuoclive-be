@@ -57,7 +57,6 @@ Route::group(['prefix' => 'api'], function () {
             value: $token,
             minutes: 1440,
             path: '/',
-            domain: null,
             sameSite: 'None',
             secure: $secure,
             httpOnly: true,
