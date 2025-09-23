@@ -68,9 +68,9 @@ Route::group(['prefix' => 'apiProduct'], function () {
     //         ]);
     //     });
     // });
-    Route::get("testabc", function () {
-        return 'ok';
-    });
+    // Route::get("testabc", function () {
+    //     return 'ok';
+    // });
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
 

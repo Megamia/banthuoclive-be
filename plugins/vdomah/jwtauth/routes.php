@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {
 
+    Route::get("testabc", function () {
+        return 'ok';
+    });
+
     // ===== LOGIN =====
     Route::post('login', function (Request $request) {
         if (Settings::get('is_login_disabled'))
@@ -49,7 +53,7 @@ Route::group(['prefix' => 'api'], function () {
     // ===== LOGOUT =====
     Route::post('logout', function (Request $request) {
         try {
-            $token = $request->bearerToken(); 
+            $token = $request->bearerToken();
             if ($token) {
                 JWTAuth::invalidate($token);
             }
