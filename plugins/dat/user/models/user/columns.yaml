@@ -1,0 +1,13 @@
+columns:
+    id:
+        label: ID
+        type: number
+    email:
+        label: Email
+        type: text
+    phone:
+        label: 'Số điện thoại'
+        type: text
+    address:
+        label: 'Địa chỉ'
+        type: switch

@@ -1,0 +1,10 @@
+name: UserController
+form: $/dat/user/models/user/fields.yaml
+modelClass: Dat\User\Models\User
+defaultRedirect: dat/user/usercontroller
+create:
+    redirect: 'dat/user/usercontroller/update/:id'
+    redirectClose: dat/user/usercontroller
+update:
+    redirect: dat/user/usercontroller
+    redirectClose: dat/user/usercontroller

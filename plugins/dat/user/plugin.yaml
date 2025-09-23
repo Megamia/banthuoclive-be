@@ -1,0 +1,11 @@
+plugin:
+    name: 'dat.user::lang.plugin.name'
+    description: 'dat.user::lang.plugin.description'
+    author: dat
+    icon: oc-icon-adjust
+    homepage: ''
+navigation:
+    users:
+        label: Users
+        url: dat/user/usercontroller
+        icon: icon-life-ring

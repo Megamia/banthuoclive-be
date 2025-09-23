@@ -177,7 +177,7 @@ class OrderController extends Controller
                     'to_ward_code' => $wardCode,
                     'to_district_id' => $districtID,
                     'to_province_id' => $provinceID,
-                    'required_note' => 'Cho xem hàng',
+                    'required_note' => 'KHONGCHOXEMHANG',
                     'from_name' => 'Megami Shop',
                     'from_phone' => '0869208950',
                     'from_address' => 'Hà Nội',
@@ -194,11 +194,18 @@ class OrderController extends Controller
                     'items' => $items,
                 ]);
 
-        if ($response->failed()) {
-            return ['code' => 400, 'message' => 'Khu vực hiện tại đang quá tải, vui lòng thử lại sau!'];
+        $result = $response->json();
+        if (!isset($result['code']) || $result['code'] != 200) {
+            return [
+                'code' => $result['code'] ?? 400,
+                'message' => $result['message'] ?? 'Tạo đơn hàng thất bại GHN',
+                'data' => $result['data'] ?? null,
+            ];
         }
+        \Log::warning('GHN create order response: ', $result);
 
-        return $response->json();
+
+        return $result;
     }
 
     private function isValidShippingArea($provinceId, $districtId, $subdistrictId)

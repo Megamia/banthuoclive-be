@@ -1,0 +1,52 @@
+fields:
+    id:
+        label: ID
+        span: auto
+        disabled: 1
+        type: number
+    first_name:
+        label: Tên
+        span: auto
+        type: text
+    last_name:
+        label: Họ
+        span: auto
+        type: text
+    email:
+        label: Email
+        span: auto
+        type: text
+    password:
+        label: 'Mật khẩu'
+        span: auto
+        disabled: 1
+        readOnly: 1
+        hidden: 1
+        type: text
+    api_token:
+        label: Token
+        span: auto
+        disabled: 1
+        readOnly: 1
+        hidden: 1
+        type: text
+    phone:
+        label: 'Số điện thoại'
+        span: auto
+        type: text
+    province:
+        label: 'Thành phố'
+        span: auto
+        type: text
+    district:
+        label: Quận
+        span: auto
+        type: text
+    subdistrict:
+        label: Huyện
+        span: auto
+        type: text
+    address:
+        label: 'Địa chỉ cụ thể'
+        span: auto
+        type: text
