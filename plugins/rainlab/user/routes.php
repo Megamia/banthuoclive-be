@@ -1,13 +1,17 @@
 <?php
+
 use Illuminate\Http\Request;
 use RainLab\User\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 Route::group(['prefix' => 'apiUser'], function () {
+
+    // Lấy thông tin người dùng
     Route::post('profile', function (Request $request) {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            $token = $request->bearerToken();
+            $user = JWTAuth::setToken($token)->authenticate();
 
             if (!$user) {
                 return response()->json(['message' => 'User not found'], 404);
@@ -17,8 +21,8 @@ Route::group(['prefix' => 'apiUser'], function () {
 
             return response()->json([
                 'id' => $user->id,
-                'first_name' => $user->additional_user->first_name ?? '',
-                'last_name' => $user->additional_user->last_name ?? '',
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'email' => $user->email,
                 'additional_user' => $user->additional_user,
             ]);
@@ -27,18 +31,19 @@ Route::group(['prefix' => 'apiUser'], function () {
         }
     });
 
+    // Cập nhật thông tin người dùng
     Route::post('/change-info', function (Request $request) {
-        $user = checkToken($request);
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
+        $token = $request->bearerToken();
+        $user = JWTAuth::setToken($token)->authenticate();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
+
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone' => [
-                'required',
-                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
-            ],
+            'phone' => ['required', 'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'],
             'province' => 'nullable|integer',
             'district' => 'nullable|integer',
             'subdistrict' => 'nullable|integer',
@@ -47,34 +52,40 @@ Route::group(['prefix' => 'apiUser'], function () {
 
         $user->update([
             'first_name' => $validatedData['first_name'],
-            'last_name' => $validatedData['last_name'],
+            'last_name' => $validatedData['last_name'] ?? null,
         ]);
 
         $user->additional_user()->updateOrCreate(
             ['user_id' => $user->id],
             [
                 'phone' => $validatedData['phone'],
-                'province' => $validatedData['province'],
-                'district' => $validatedData['district'],
-                'subdistrict' => $validatedData['subdistrict'],
-                'address' => $validatedData['address'],
+                'province' => $validatedData['province'] ?? null,
+                'district' => $validatedData['district'] ?? null,
+                'subdistrict' => $validatedData['subdistrict'] ?? null,
+                'address' => $validatedData['address'] ?? null,
             ]
         );
+
         $data = User::with('additional_user')->find($user->id);
-        $userdata = [
+
+        return response()->json([
             'id' => $data->id,
             'first_name' => $data->first_name,
             'last_name' => $data->last_name,
             'email' => $data->email,
             'additional_user' => $data->additional_user,
-        ];
-        return response()->json($userdata);
+        ]);
     });
+
+    // Đổi mật khẩu
     Route::post('/change-password', function (Request $request) {
-        $user = checkToken($request);
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
+        $token = $request->bearerToken();
+        $user = JWTAuth::setToken($token)->authenticate();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
+
         $validated = $request->validate([
             'old_password' => 'required',
             'new_password' => [
@@ -84,7 +95,7 @@ Route::group(['prefix' => 'apiUser'], function () {
                 'regex:/[A-Z]/', // Ít nhất một chữ hoa
                 'regex:/[a-z]/', // Ít nhất một chữ thường
                 'regex:/[0-9]/', // Ít nhất một số
-                function ($attribute, $value, $fail) use ($request, $user) {
+                function ($attribute, $value, $fail) use ($user) {
                     if (Hash::check($value, $user->password)) {
                         $fail('Mật khẩu mới không được trùng với mật khẩu cũ.');
                     }
@@ -98,9 +109,12 @@ Route::group(['prefix' => 'apiUser'], function () {
         if (!Hash::check($validated['old_password'], $user->password)) {
             return response()->json(['status' => 0, 'error' => 'Mật khẩu cũ không chính xác!']);
         }
+
         $user->password = $validated['new_password'];
         $user->save();
+
         \Log::info("User ID {$user->id} đã đổi mật khẩu.", ['user_id' => $user->id]);
+
         return response()->json([
             'status' => 1,
             'message' => 'Đổi mật khẩu thành công!',
@@ -112,4 +126,3 @@ Route::group(['prefix' => 'apiUser'], function () {
         ]);
     });
 });
-

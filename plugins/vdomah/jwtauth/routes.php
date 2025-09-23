@@ -11,12 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 Route::group(['prefix' => 'api'], function () {
+
     Route::post('login', function (Request $request) {
-        if (Settings::get('is_login_disabled'))
+        if (Settings::get('is_login_disabled')) {
             App::abort(404, 'Page not found');
+        }
 
         $login_fields = Settings::get('login_fields', ['email', 'password']);
-
         $credentials = $request->only($login_fields);
 
         try {
@@ -38,91 +39,20 @@ Route::group(['prefix' => 'api'], function () {
             'additional_user' => $userModel->additional_user,
             'is_activated' => $userModel->is_activated ?? false,
         ];
-        $user = json_decode(json_encode($user), true);
 
-        $domain = app()->environment('local') ? 'localhost' : 'banthuoclive-fe.vercel.app';
-
-        $cookie = cookie(
-            name: 'token',
-            value: $token,
-            minutes: 1440,
-            path: '/',
-            domain: $domain,
-            sameSite: app()->environment('local') ? 'Lax' : 'None',
-            secure: !app()->environment('local'),
-            httpOnly: true,
-        );
-
-        // if no errors are encountered we can return a JWT
         return response()->json([
             'user' => $user,
-        ])->cookie($cookie);
+            'token' => $token,
+        ]);
     });
-
-    Route::post('refresh', function (Request $request) {
-        if (Settings::get('is_refresh_disabled'))
-            App::abort(404, 'Page not found');
-
-        $token = Request::get('token');
-
-        try {
-            // attempt to refresh the JWT
-            if (!$token = JWTAuth::refresh($token)) {
-                return response()->json(['error' => 'could_not_refresh_token'], 401);
-            }
-        } catch (Exception $e) {
-            // something went wrong
-            return response()->json(['error' => 'could_not_refresh_token'], 500);
-        }
-
-        // if no errors are encountered we can return a new JWT
-        return response()->json(compact('token'));
-    });
-
-    Route::post('invalidate', function (Request $request) {
-        if (Settings::get('is_invalidate_disabled'))
-            App::abort(404, 'Page not found');
-
-        $token = Request::get('token');
-
-        try {
-            // invalidate the token
-            JWTAuth::invalidate($token);
-        } catch (Exception $e) {
-            // something went wrong
-            return response()->json(['error' => 'could_not_invalidate_token'], 500);
-        }
-
-        // if no errors we can return a message to indicate that the token was invalidated
-        return response()->json('token_invalidated');
-    });
-
-    Route::post('logout', function (Request $request) {
-        try {
-            $token = $request->bearerToken();
-
-            if ($token) {
-                JWTAuth::invalidate($token); 
-            }
-
-            return response()->json([
-                'message' => 'logged_out'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => 'Logout failed',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    });
-
 
     Route::post('signup', function (Request $request) {
-        if (Settings::get('is_signup_disabled'))
+        if (Settings::get('is_signup_disabled')) {
             App::abort(404, 'Page not found');
+        }
 
-        $login_fields = Settings::get('signup_fields', ['email', 'password', 'password_confirmation']);
-        $credentials = $request->only($login_fields);
+        $signup_fields = Settings::get('signup_fields', ['email', 'password', 'password_confirmation']);
+        $credentials = $request->only($signup_fields);
 
         try {
             $userModel = UserModel::create($credentials);
@@ -142,24 +72,72 @@ Route::group(['prefix' => 'api'], function () {
 
         $token = JWTAuth::fromUser($userModel);
 
-        return Response::json(compact('token', 'user'));
+        return Response::json([
+            'user' => $user,
+            'token' => $token
+        ]);
+    });
+
+    Route::post('logout', function (Request $request) {
+        try {
+            $token = $request->header('Authorization');
+            if ($token) {
+                $token = str_replace('Bearer ', '', $token);
+                JWTAuth::invalidate($token);
+            }
+
+            return response()->json(['message' => 'logged_out']);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Logout failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    });
+
+    Route::post('refresh', function (Request $request) {
+        $token = $request->header('Authorization');
+        if (!$token)
+            return response()->json(['error' => 'Token not provided'], 400);
+
+        $token = str_replace('Bearer ', '', $token);
+
+        try {
+            $token = JWTAuth::refresh($token);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'could_not_refresh_token'], 500);
+        }
+
+        return response()->json(['token' => $token]);
     });
 
     Route::post('check-token', function (Request $request) {
-        Log::info('Check token endpoint hit');
-        $token = Request::cookie('token');
+        $token = $request->header('Authorization');
+        if (!$token)
+            return response()->json(['message' => 'Token not provided'], 401);
 
-        if (!$token) {
-            Log::error('Token not found in cookie');
-            return response()->json(['message' => 'Token not found'], 401);
-        }
+        $token = str_replace('Bearer ', '', $token);
 
         try {
             $user = JWTAuth::setToken($token)->toUser();
-            return response()->json(['message' => 'Token is valid', 'user' => $user], 200);
+            return response()->json(['message' => 'Token is valid', 'user' => $user]);
         } catch (Exception $e) {
-            Log::error('Error validating token: ' . $e->getMessage());
-            return response()->json(['message' => 'Token is invalid or expired'], 500);
+            return response()->json(['message' => 'Token is invalid or expired'], 401);
+        }
+    });
+
+    Route::post('invalidate', function (Request $request) {
+        $token = $request->header('Authorization');
+        if (!$token)
+            return response()->json(['message' => 'Token not provided'], 401);
+
+        $token = str_replace('Bearer ', '', $token);
+
+        try {
+            JWTAuth::invalidate($token);
+            return response()->json(['message' => 'token_invalidated']);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'could_not_invalidate_token'], 500);
         }
     });
 
