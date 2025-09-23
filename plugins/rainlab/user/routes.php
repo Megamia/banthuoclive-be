@@ -2,22 +2,33 @@
 use Illuminate\Http\Request;
 use RainLab\User\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 Route::group(['prefix' => 'apiUser'], function () {
     Route::post('profile', function (Request $request) {
-        $user = checkToken($request);
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return response()->json(['message' => 'Token not provided'], 401);
         }
+
+        $token = substr($authHeader, 7); 
+
+        try {
+            $user = JWTAuth::setToken($token)->toUser();
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Token invalid or expired'], 401);
+        }
+
         $data = User::with(['additional_user'])->find($user->id);
-        $userdata = [
+
+        return response()->json([
             'id' => $data->id,
             'first_name' => $data->first_name,
             'last_name' => $data->last_name,
             'email' => $data->email,
             'additional_user' => $data->additional_user,
-        ];
-        return response()->json($userdata);
+        ]);
     });
     Route::get("testApiUser", function () {
         return response()->json(['message' => 'API user test OK']);

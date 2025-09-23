@@ -4,7 +4,6 @@ use RainLab\User\Models\User as UserModel;
 use Vdomah\JWTAuth\Models\Settings;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\App;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -21,15 +20,13 @@ Route::group(['prefix' => 'api'], function () {
 
         $login_fields = Settings::get('login_fields', ['email', 'password']);
 
-        $credentials = Input::only($login_fields);
+        $credentials = $request->only($login_fields);
 
         try {
-            // verify the credentials and create a token for the user
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Sai tài khoản hoặc mật khẩu'], 205);
             }
         } catch (JWTException $e) {
-            // something went wrong
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
@@ -37,6 +34,8 @@ Route::group(['prefix' => 'api'], function () {
 
         if ($userModel->methodExists('getAuthApiSigninAttributes')) {
             $user = $userModel->getAuthApiSigninAttributes();
+            \Log::info('User login:', ['user' => $user]);
+
         } else {
             $user = [
                 'id' => $userModel->id,
@@ -134,7 +133,7 @@ Route::group(['prefix' => 'api'], function () {
             App::abort(404, 'Page not found');
 
         $login_fields = Settings::get('signup_fields', ['email', 'password', 'password_confirmation']);
-        $credentials = Input::only($login_fields);
+        $credentials = $request->only($login_fields);
 
         try {
             $userModel = UserModel::create($credentials);
