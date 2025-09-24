@@ -1,0 +1,6 @@
+{
+  "web": {
+    "document_root": ".",
+    "index": "index.php"
+  }
+}
