@@ -42,4 +42,4 @@ RUN mkdir -p /var/www/public \
 EXPOSE 8000
 
 # Run Laravel dev server
-CMD ["sh", "-c", "php artisan livotec:upload-images && php -S 0.0.0.0:8000 -t . vendor/october/rain/src/Foundation/resources/server.php"]
+CMD ["php", "-S", "0.0.0.0:8000", "-t", ".", "vendor/october/rain/src/Foundation/resources/server.php"]
