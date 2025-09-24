@@ -1,3 +1,5 @@
+DirectoryIndex index.php
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
@@ -17,3 +19,5 @@
     # Redirect everything else to index.php
     RewriteRule ^ index.php [L]
 </IfModule>
+
+Options -Indexes
