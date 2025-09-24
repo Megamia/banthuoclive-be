@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ca37e914fbc08108be35fbc04bf8c34",
+    "content-hash": "4e05bf0e06fc84cef21d788863538cd9",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -10340,18 +10340,6 @@
                 }
             ],
             "time": "2025-05-03T07:21:55+00:00"
-        },
-        {
-            "name": "vdomah/jwtauth-plugin",
-            "version": "v1.0.12",
-            "dist": {
-                "type": "zip",
-                "url": "https://gateway.octobercms.com/composer/dist/vdomah/jwtauth-plugin/vdomah-jwtauth-plugin.zip"
-            },
-            "require": {
-                "composer/installers": "~1.0"
-            },
-            "type": "october-plugin"
         },
         {
             "name": "vlucas/phpdotenv",
