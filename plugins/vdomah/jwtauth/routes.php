@@ -3,7 +3,7 @@
 use RainLab\User\Models\User as UserModel;
 use Vdomah\JWTAuth\Models\Settings;
 
-Route::group(['prefix' => 'api'], function() {
+Route::group(['prefix' => 'api'], function () {
 
     Route::post('login', function (Request $request) {
         if (Settings::get('is_login_disabled'))
@@ -15,7 +15,7 @@ Route::group(['prefix' => 'api'], function() {
 
         try {
             // verify the credentials and create a token for the user
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'invalid_credentials'], 401);
             }
         } catch (JWTException $e) {
@@ -108,5 +108,8 @@ Route::group(['prefix' => 'api'], function() {
         $token = JWTAuth::fromUser($userModel);
 
         return Response::json(compact('token', 'user'));
+    });
+    Route::get("testabc", function () {
+        return 'ok';
     });
 });
