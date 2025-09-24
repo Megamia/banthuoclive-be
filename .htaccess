@@ -1,9 +1,11 @@
+DirectoryIndex index.php
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Force HTTPS nếu muốn
-    # RewriteCond %{HTTPS} off
-    # RewriteRule (.*) https://%{SERVER_NAME}/$1 [L,R=301]
+    # Nếu muốn ép HTTPS, bỏ comment hai dòng này
+    #RewriteCond %{HTTPS} off
+    #RewriteRule ^(.*)$ https://%{SERVER_NAME}/$1 [L,R=301]
 
     # Handle Authorization header
     RewriteCond %{HTTP:Authorization} .
@@ -14,6 +16,7 @@
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Redirect everything else to index.php
     RewriteRule ^ index.php [L]
 </IfModule>
+
+Options -Indexes
