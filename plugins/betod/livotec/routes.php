@@ -3,7 +3,7 @@
 use Betod\Livotec\Controllers\AppointmentController;
 use Betod\Livotec\Controllers\GhnController;
 use Betod\Livotec\Models\Doctor;
-use Betod\Livotec\Models\IngredientsAndInstructions;
+// use Betod\Livotec\Models\IngredientsAndInstructions;
 use Betod\Livotec\Models\Orders;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
@@ -12,8 +12,6 @@ use Betod\Livotec\Controllers\PayPalController;
 use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\URL;
-use Betod\Livotec\Controllers\AuthController;
 
 if (!function_exists('imagePathToRelative')) {
     function imagePathToRelative($diskName)
