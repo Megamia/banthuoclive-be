@@ -1,7 +1,0 @@
-{
-  "deploy": {
-    "php": {
-      "documentRoot": "."
-    }
-  }
-}
