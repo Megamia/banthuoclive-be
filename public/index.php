@@ -15,7 +15,7 @@
 |
 */
 
-require __DIR__ . '/bootstrap/autoload.php';
+require __DIR__ . '/../bootstrap/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ require __DIR__ . '/bootstrap/autoload.php';
 |
 */
 
-$app = require_once __DIR__ . '/bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 if (
     (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
