@@ -22,6 +22,7 @@ class OrderController extends Controller
     public function __construct()
     {
         $this->ghn = new GhnController();
+        $this->token = env('GHN_API_KEY');
     }
 
     public function createOrder(Request $request)
