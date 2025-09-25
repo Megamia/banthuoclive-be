@@ -140,7 +140,8 @@ class GhnController extends Controller
             return null;
         }
 
-        $data = $this->getProvinces();
+        $response = $this->getProvinces();
+        $data = $response->getData(true);
 
         if (empty($data['data'])) {
             \Log::warning("No provinces found");
@@ -169,8 +170,9 @@ class GhnController extends Controller
             return null;
         }
 
-        $data = $this->getDistricts($provinceId);
-
+        $response = $this->getDistricts($provinceId);
+        $data = $response->getData(true);
+        
         if (empty($data['data'])) {
             \Log::warning("No districts found for provinceId: $provinceId");
             return null;
@@ -197,7 +199,8 @@ class GhnController extends Controller
             return null;
         }
 
-        $data = $this->getWards($districtId);
+        $response = $this->getWards($districtId);
+        $data = $response->getData(true);
 
         if (empty($data['data']) || !is_array($data['data'])) {
             \Log::warning("No wards data or data format invalid for districtId: $districtId");

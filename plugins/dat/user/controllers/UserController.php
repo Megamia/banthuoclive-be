@@ -70,7 +70,12 @@ class UserController extends Controller
             'address' => $user->address,
         ];
 
-        return response()->json(['status' => 1, 'user' => $userData, 'token' => $token])->cookie($cookie);
+        return response()->json([
+            'status' => 1,
+            'message' => 'Đăng nhập thành công',
+            'user' => $userData,
+            'token' => $token
+        ])->cookie($cookie);
     }
 
     public function signup(Request $request)
@@ -128,6 +133,8 @@ class UserController extends Controller
             'subdistrict' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
         ]);
+
+        \Log::info('Validated data: ', $validatedData);
 
         $user->update($validatedData);
         $user->refresh();
