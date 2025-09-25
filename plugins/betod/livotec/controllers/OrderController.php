@@ -56,6 +56,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'paypal_order_id' => 'nullable|string|max:500',
         ]);
 
         // \Log::info("Validated data: ", $validatedData);
@@ -68,7 +69,7 @@ class OrderController extends Controller
         $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
 
         if ($request->has('paypal_order_id')) {
-            $propertyData['paymenttype'] = 1; 
+            $propertyData['paymenttype'] = 1;
             $propertyData['paypal_order_id'] = $request->input('paypal_order_id');
         }
 
