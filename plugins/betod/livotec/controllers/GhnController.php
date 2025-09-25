@@ -17,19 +17,30 @@ class GhnController extends Controller
     {
         $apiKey = env('GHN_API_KEY');
         $baseUrl = env('GHN_BASE_URL');
-        $response = Http::withHeaders([
-            'Token' => $apiKey,
-            'Content-Type' => 'application/json',
-        ])->get($baseUrl . '/master-data/province');
 
-        $data = $response->json();
-
-        if (empty($data['data'])) {
-            \Log::warning("GHN API response missing 'data' field: " . json_encode($data));
-            return null;
+        if (!$apiKey || !$baseUrl) {
+            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
-        return $data;
+        try {
+            $response = Http::withHeaders([
+                'Token' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->get($baseUrl . '/master-data/province');
+
+            $data = $response->json();
+
+            if (empty($data['data'])) {
+                \Log::warning("GHN API response missing 'data': " . json_encode($data));
+                return response()->json(['data' => []]);
+            }
+
+            return response()->json(['status' => 1, 'data' => $data['data']]);
+        } catch (\Exception $e) {
+            \Log::error("Failed to fetch GHN provinces: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'Failed to fetch GHN provinces'], 500);
+        }
     }
 
     public function getDistricts($provinceId)
@@ -37,26 +48,36 @@ class GhnController extends Controller
         $apiKey = env('GHN_API_KEY');
         $baseUrl = env('GHN_BASE_URL');
 
-        if (empty($provinceId)) {
+        if (!$provinceId) {
             \Log::warning("getDistricts called with empty provinceId");
-            return null;
+            return response()->json(['data' => []]);
         }
 
-        $response = Http::withHeaders([
-            'Token' => $apiKey,
-            'Content-Type' => 'application/json',
-        ])->get($baseUrl . '/master-data/district', [
-                    'province_id' => $provinceId,
-                ]);
-
-        $data = $response->json();
-
-        if (empty($data['data'])) {
-            \Log::warning("GHN API response missing 'data' field or empty in getDistricts for provinceId {$provinceId}: " . json_encode($data));
-            return null;
+        if (!$apiKey || !$baseUrl) {
+            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
-        return $data;
+        try {
+            $response = Http::withHeaders([
+                'Token' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->get($baseUrl . '/master-data/district', [
+                        'province_id' => $provinceId,
+                    ]);
+
+            $data = $response->json();
+
+            if (empty($data['data'])) {
+                \Log::warning("GHN API response missing 'data' or empty for provinceId {$provinceId}: " . json_encode($data));
+                return response()->json(['data' => []]);
+            }
+
+            return response()->json(['status' => 1, 'data' => $data['data']]);
+        } catch (\Exception $e) {
+            \Log::error("Failed to fetch districts for provinceId {$provinceId}: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'Failed to fetch districts'], 500);
+        }
     }
 
     public function getWards($districtId)
@@ -72,26 +93,36 @@ class GhnController extends Controller
             }
         }
 
-        if (empty($districtId)) {
+        if (!$districtId) {
             \Log::warning("getWards called with empty districtId");
-            return null;
+            return response()->json(['data' => []]);
         }
 
-        $response = Http::withHeaders([
-            'Token' => $apiKey,
-            'Content-Type' => 'application/json',
-        ])->get($baseUrl . '/master-data/ward', [
-                    'district_id' => $districtId,
-                ]);
-
-        $data = $response->json();
-
-        if (empty($data['data'])) {
-            \Log::warning("GHN API response missing 'data' field or empty in getWards for districtId {$districtId}: " . json_encode($data));
-            return null;
+        if (!$apiKey || !$baseUrl) {
+            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
-        return $data;
+        try {
+            $response = Http::withHeaders([
+                'Token' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->get($baseUrl . '/master-data/ward', [
+                        'district_id' => $districtId,
+                    ]);
+
+            $data = $response->json();
+
+            if (empty($data['data'])) {
+                \Log::warning("GHN API response missing 'data' or empty for districtId {$districtId}: " . json_encode($data));
+                return response()->json(['data' => []]);
+            }
+
+            return response()->json(['status' => 1, 'data' => $data['data']]);
+        } catch (\Exception $e) {
+            \Log::error("Failed to fetch wards for districtId {$districtId}: " . $e->getMessage());
+            return response()->json(['data' => [], 'message' => 'Failed to fetch wards'], 500);
+        }
     }
 
     private function normalizeName($name)
