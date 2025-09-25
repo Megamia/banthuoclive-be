@@ -27,7 +27,7 @@ class UserController extends Controller
 
     public function authenticateToken(Request $request)
     {
-        $authHeader = $request->header('Authorization'); 
+        $authHeader = $request->header('Authorization');
 
         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             return null;
@@ -49,7 +49,7 @@ class UserController extends Controller
         $user = User::where('email', $email)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
-            return response()->json(['error' => 'Sai tài khoản hoặc mật khẩu'], 401);
+            return response()->json(['status' => 0, 'message' => 'Sai tài khoản hoặc mật khẩu'], 401);
         }
 
         $token = Str::random(60);
@@ -70,7 +70,7 @@ class UserController extends Controller
             'address' => $user->address,
         ];
 
-        return response()->json(['user' => $userData, 'token' => $token])->cookie($cookie);
+        return response()->json(['status' => 1, 'user' => $userData, 'token' => $token])->cookie($cookie);
     }
 
     public function signup(Request $request)
@@ -80,7 +80,7 @@ class UserController extends Controller
         $password = $request->input('password');
 
         if (User::where('email', $email)->exists()) {
-            return response()->json(['error' => 'Email đã được sử dụng'], 400);
+            return response()->json(['status' => 0, 'message' => 'Email đã được sử dụng']);
         }
 
         $user = new User();
@@ -103,7 +103,7 @@ class UserController extends Controller
         $user = $this->authenticateToken($request);
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 1, 'message' => 'Xác thực thông tin người dùng thất bại']);
         }
 
         return response()->json(['status' => 1, 'user' => $user]);
@@ -113,7 +113,7 @@ class UserController extends Controller
         $user = $this->authenticateToken($request);
 
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['status' => 1, 'message' => 'Xác thực thông tin người dùng thất bại']);
         }
 
         $validatedData = $request->validate([
@@ -125,7 +125,7 @@ class UserController extends Controller
             ],
             'province' => 'nullable|integer',
             'district' => 'nullable|integer',
-            'subdistrict' => 'nullable|integer',
+            'subdistrict' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
         ]);
 
