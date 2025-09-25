@@ -237,3 +237,6 @@ v1.0.85:
 v1.0.86:
     - 'Updated table betod_livotec_appointment'
     - builder_table_update_betod_livotec_appointment_4.php
+v1.0.87:
+    - 'Updated table betod_livotec_orders'
+    - builder_table_update_betod_livotec_orders_10.php
