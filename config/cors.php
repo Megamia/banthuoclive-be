@@ -14,8 +14,6 @@ return [
     'exposed_headers' => [],
     'max_age' => 0,
 
-    // 'supports_credentials' => app()->environment('local') ? false : true,
-
     //LOCAL
     // 'supports_credentials' => false,
     //LOCAL

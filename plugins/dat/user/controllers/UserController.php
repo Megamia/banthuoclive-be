@@ -27,16 +27,19 @@ class UserController extends Controller
 
     public function authenticateToken(Request $request)
     {
-        $token = $request->cookie('token');
+        $authHeader = $request->header('Authorization'); 
 
-        if (!$token) {
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             return null;
         }
+
+        $token = $matches[1];
 
         $user = User::where('api_token', $token)->first();
 
         return $user ?: null;
     }
+
 
     public function login(Request $request)
     {
