@@ -154,7 +154,10 @@ class UserController extends Controller
     public function test(Request $request)
     {
         $data = User::all();
-        return $data;
+        return response()->json([
+            'message' => "test ok",
+            'data' => $data
+        ]);
     }
 
 }
