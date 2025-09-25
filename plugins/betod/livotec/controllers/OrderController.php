@@ -67,6 +67,11 @@ class OrderController extends Controller
         $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
         $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
 
+        if ($request->has('paypal_order_id')) {
+            $propertyData['paymenttype'] = 1; 
+            $propertyData['paypal_order_id'] = $request->input('paypal_order_id');
+        }
+
         try {
             DB::beginTransaction();
 
