@@ -15,14 +15,17 @@ class GhnController extends Controller
 
     public function getProvinces()
     {
+        $apiKey = env('GHN_API_KEY');
+        $baseUrl = env('GHN_BASE_URL');
         $response = Http::withHeaders([
-            'Token' => $this->token,
-        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province');
+            'Token' => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->get($baseUrl . '/master-data/province');
 
         $data = $response->json();
 
         if (empty($data['data'])) {
-            \Log::warning("GHN API response missing 'data' field in getProvinces: " . json_encode($data));
+            \Log::warning("GHN API response missing 'data' field: " . json_encode($data));
             return null;
         }
 
@@ -31,14 +34,18 @@ class GhnController extends Controller
 
     public function getDistricts($provinceId)
     {
+        $apiKey = env('GHN_API_KEY');
+        $baseUrl = env('GHN_BASE_URL');
+
         if (empty($provinceId)) {
             \Log::warning("getDistricts called with empty provinceId");
             return null;
         }
 
         $response = Http::withHeaders([
-            'Token' => $this->token,
-        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district', [
+            'Token' => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->get($baseUrl . '/master-data/district', [
                     'province_id' => $provinceId,
                 ]);
 
@@ -54,11 +61,14 @@ class GhnController extends Controller
 
     public function getWards($districtId)
     {
+        $apiKey = env('GHN_API_KEY');
+        $baseUrl = env('GHN_BASE_URL');
+
         if (is_array($districtId)) {
             if (isset($districtId['DistrictID'])) {
                 $districtId = $districtId['DistrictID'];
             } else {
-                $districtId = reset($districtId); 
+                $districtId = reset($districtId);
             }
         }
 
@@ -68,8 +78,9 @@ class GhnController extends Controller
         }
 
         $response = Http::withHeaders([
-            'Token' => $this->token,
-        ])->get('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward', [
+            'Token' => $apiKey,
+            'Content-Type' => 'application/json',
+        ])->get($baseUrl . '/master-data/ward', [
                     'district_id' => $districtId,
                 ]);
 
@@ -107,7 +118,7 @@ class GhnController extends Controller
 
         foreach ($data['data'] as $province) {
             if ($province['ProvinceID'] == $provinceId) {
-                return $province;
+                return $province ?? [];
             }
         }
 
@@ -136,7 +147,7 @@ class GhnController extends Controller
 
         foreach ($data['data'] as $district) {
             if ($district['DistrictID'] == $districtId) {
-                return $district;
+                return $district ?? [];
             }
         }
 
