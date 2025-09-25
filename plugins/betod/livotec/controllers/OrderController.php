@@ -139,7 +139,9 @@ class OrderController extends Controller
             \Log::error('Error creating order: ' . $e->getMessage());
             return response()->json([
                 'code' => 500,
-                'message' => 'Lỗi hệ thống, tạo đơn không thành công.'
+                'message' => 'Lỗi hệ thống, tạo đơn không thành công.',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ], 500);
         }
     }
