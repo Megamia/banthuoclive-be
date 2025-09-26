@@ -144,6 +144,66 @@ class UserController extends Controller
             'newDataUser' => $user
         ]);
     }
+
+    public function change_password(Request $request)
+    {
+        $user = $this->authenticateToken($request);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 0,
+                'code' => 401,
+                'message' => 'Xác thực thông tin người dùng thất bại'
+            ]);
+        }
+
+        try {
+            $validated = $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'regex:/[A-Z]/',
+                    'regex:/[a-z]/',
+                    'regex:/[0-9]/',
+                    function ($attribute, $value, $fail) use ($user) {
+                        if (Hash::check($value, $user->password)) {
+                            $fail('Mật khẩu mới không được trùng với mật khẩu cũ.');
+                        }
+                    },
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $messages = collect($e->errors())->flatten()->join(' ');
+
+            return response()->json([
+                'status' => 0,
+                'code' => 422,
+                'message' => $messages
+            ]);
+        }
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'status' => 0,
+                'code' => 403,
+                'message' => 'Mật khẩu hiện tại không đúng'
+            ]);
+        }
+
+        $user->password = Hash::make($validated['new_password']);
+        $user->save();
+
+        return response()->json([
+            'status' => 1,
+            'code' => 200,
+            'message' => 'Đổi mật khẩu thành công'
+        ]);
+    }
+
+
+
     public function logout(Request $request)
     {
         $user = $this->authenticateToken($request);
