@@ -40,8 +40,8 @@ if (!function_exists('getCloudinaryUrlFromDiskName')) {
 }
 
 
-if (!function_exists('attachCloudinaryUrlToProduct')) {
-    function attachCloudinaryUrlToProduct($product)
+if (!function_exists('attachCloudinaryUrl')) {
+    function attachCloudinaryUrl($product)
     {
         if ($product->image) {
             $product->image->cloudinary_url = getCloudinaryUrlFromDiskName($product->image->disk_name);
@@ -73,7 +73,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
 
-        $allProduct->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $allProduct->transform(fn($p) => attachCloudinaryUrl($p));
 
         return response()->json([
             'allProduct' => $allProduct,
@@ -93,7 +93,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
             ->whereIn('category_id', $categoryIds)
             ->get();
 
-        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $products->transform(fn($p) => attachCloudinaryUrl($p));
 
         return response()->json([
             'category' => $category,
@@ -113,7 +113,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
             ->where('category_id', $category->id)
             ->get();
 
-        $products->transform(fn($p) => attachCloudinaryUrlToProduct($p));
+        $products->transform(fn($p) => attachCloudinaryUrl($p));
 
         return $products;
     });
@@ -126,7 +126,7 @@ Route::group(['prefix' => 'apiProduct'], function () {
         }
 
         // return ($product);
-        return attachCloudinaryUrlToProduct($product);
+        return attachCloudinaryUrl($product);
     });
 });
 
@@ -173,57 +173,13 @@ Route::group(['prefix' => 'apiOrder'], function () {
 });
 
 Route::group(['prefix' => 'apiAppointment'], function () {
-    Route::get("specialties", function () {
-        $specialties = Specialties::all();
-
-        if ($specialties->isEmpty()) {
-            return response()->json([
-                'status' => 0,
-                'specialties' => 'No data',
-            ]);
-        }
-
-        return response()->json([
-            'status' => 1,
-            'specialties' => $specialties,
-        ]);
-    });
-
-    Route::get("specialties/{specialtyId}/doctors", function ($specialtyId) {
-        $doctors = Doctor::where('specialties_id', $specialtyId)->get();
-        if ($doctors->isEmpty()) {
-            return response()->json([
-                'status' => 0,
-                'doctors' => 'No data',
-            ]);
-        }
-        return response()->json([
-            'status' => 1,
-            'doctors' => $doctors,
-        ]);
-    });
-
-    Route::get("doctors/{doctorId}/schedules", function ($doctorId) {
-        $schedules = Schedules::where('doctor_id', $doctorId)
-            ->orderBy('day_of_week', 'asc')
-            ->orderBy('start_time', 'asc')
-            ->get();
-        if ($schedules->isEmpty()) {
-            return response()->json([
-                'status' => 0,
-                'schedules' => 'No data',
-            ]);
-        }
-        return response()->json([
-            'status' => 1,
-            'schedules' => $schedules,
-        ]);
-    });
+    Route::get("getAllDoctor", [AppointmentController::class, 'getAllDoctor']);
+    Route::get("getAllDataDoctorById/{doctorId}", [AppointmentController::class, 'getAllDataDoctorById']);
+    Route::get("specialties", [AppointmentController::class, 'specialties']);
+    Route::get("specialties/{specialtyId}/doctors", [AppointmentController::class, 'getDoctorsBySpecialty']);
+    Route::get("doctors/{doctorId}/schedules", [AppointmentController::class, 'getSchedulesByDoctorId']);
     Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
 });
-
-
-
 
 Route::group(['prefix' => 'apiPaypal'], function () {
     Route::post('createOrder', [PayPalController::class, 'createOrder']);

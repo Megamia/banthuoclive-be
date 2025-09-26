@@ -24,6 +24,10 @@ class Doctor extends Model
     /**
      * @var array rules for validation.
      */
+
+    public $attachOne = [
+        'image' => 'System\Models\File'
+    ];
     public $belongsTo = [
         'specialties' => 'Betod\Livotec\Models\Specialties',
     ];

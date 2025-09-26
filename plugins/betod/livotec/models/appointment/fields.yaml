@@ -11,7 +11,7 @@ fields:
         type: relation
     user:
         label: 'Bệnh nhân'
-        nameFrom: name
+        nameFrom: email
         descriptionFrom: description
         span: auto
         type: relation

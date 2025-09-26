@@ -240,3 +240,6 @@ v1.0.86:
 v1.0.87:
     - 'Updated table betod_livotec_orders'
     - builder_table_update_betod_livotec_orders_10.php
+v1.0.88:
+    - 'Updated table betod_livotec_doctor'
+    - builder_table_update_betod_livotec_doctor_4.php

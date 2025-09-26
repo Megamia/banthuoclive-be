@@ -147,19 +147,17 @@ class UserController extends Controller
     public function logout(Request $request)
     {
         $user = $this->authenticateToken($request);
-
         if ($user) {
             $user->api_token = null;
             $user->save();
         }
 
-        $cookie = cookie('token', '', -1, '/', null, false, true);
-
         return response()->json([
             'status' => 1,
             'message' => 'Đăng xuất thành công'
-        ])->cookie($cookie);
+        ])->withCookie(cookie()->forget('token'));
     }
+
 
     public function test(Request $request)
     {

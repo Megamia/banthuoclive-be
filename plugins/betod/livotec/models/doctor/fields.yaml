@@ -1,18 +1,17 @@
 tabs:
     fields:
         specialties:
-            label: "Chuyên khoa"
+            label: 'Chuyên khoa'
             nameFrom: name
             descriptionFrom: description
             span: full
             type: relation
-            tab: "Chuyên khoa"
+            tab: 'Chuyên khoa'
         schedules:
-            label: "Lịch làm việc"
+            label: 'Lịch làm việc'
             type: partial
             path: ~/plugins/betod/livotec/models/doctor/_schedules.htm
-            tab: "Lịch làm việc"
-
+            tab: 'Lịch làm việc'
 fields:
     id:
         label: ID
@@ -23,3 +22,32 @@ fields:
         label: Tên
         span: auto
         type: text
+    experience_year:
+        label: 'Năm kinh nghiệm'
+        type: datepicker
+        mode: date
+        format: 'Y'
+    short_description:
+        label: 'Mô tả ngắn'
+        size: large
+        span: left
+        type: richeditor
+    specialty_description:
+        label: 'Mô tả sở trường chuyên môn'
+        size: large
+        span: auto
+        type: richeditor
+    work_process:
+        label: 'Quá trình công tác'
+        size: large
+        span: auto
+        type: richeditor
+    image:
+        label: 'Chân dung'
+        mode: image
+        useCaption: true
+        thumbOptions:
+            mode: crop
+            extension: auto
+        span: auto
+        type: fileupload

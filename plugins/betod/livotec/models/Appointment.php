@@ -1,6 +1,5 @@
 <?php
 namespace Betod\Livotec\Models;
-
 use Model;
 
 /**
@@ -32,7 +31,7 @@ class Appointment extends Model
             'otherKey' => 'id'
         ],
         'user' => [
-            'RainLab\User\Models\User',
+            'Dat\User\Models\User',
             'key' => 'user_id',
             'otherKey' => 'id'
         ]
