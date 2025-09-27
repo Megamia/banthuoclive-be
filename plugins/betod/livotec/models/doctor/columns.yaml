@@ -5,6 +5,9 @@ columns:
     name:
         label: 'Tên bác sĩ'
         type: text
+    phone:
+        label: 'Số điện thoại'
+        type: text
     experience_year:
         label: 'Năm kinh nghiệm'
         type: number

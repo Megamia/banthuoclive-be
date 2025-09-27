@@ -9,6 +9,7 @@ use Betod\Livotec\Models\Doctor;
 use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentController extends Controller
 {
@@ -82,35 +83,84 @@ class AppointmentController extends Controller
             'meeting_time' => 'required|date',
         ])->validate();
 
-        $exists = Appointment::where('user_id', $validated['user_id'])
-            ->where('doctor_id', $validated['doctor_id'])
-            ->where('meeting_time', $validated['meeting_time'])
-            ->exists();
+        try {
+            $appointment = DB::transaction(function () use ($validated) {
+                $timestamp = strtotime($validated['meeting_time']);
+                $minutes = date('i', $timestamp);
+                $roundedMinutes = floor($minutes / 30) * 30;
+                $slot = date(
+                    'Y-m-d H:' . str_pad($roundedMinutes, 2, '0', STR_PAD_LEFT) . ':00',
+                    $timestamp
+                );
 
-        if ($exists) {
+                $exists = Appointment::where('user_id', $validated['user_id'])
+                    ->where('doctor_id', $validated['doctor_id'])
+                    ->where('meeting_time', $slot)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($exists) {
+                    throw new \Exception("APPOINTMENT_ALREADY_EXISTS");
+                }
+
+                $doctor = Doctor::find($validated['doctor_id']);
+                $capacityPerSlot = $doctor->capacity_per_slot ?? 5;
+
+                $countInSlot = Appointment::where('doctor_id', $validated['doctor_id'])
+                    ->where('meeting_time', $slot)
+                    ->lockForUpdate()
+                    ->count();
+
+                if ($countInSlot >= $capacityPerSlot) {
+                    throw new \Exception("SLOT_FULL");
+                }
+
+                $queueNumber = $countInSlot + 1;
+
+                return Appointment::create([
+                    'user_id' => $validated['user_id'],
+                    'doctor_id' => $validated['doctor_id'],
+                    'meeting_time' => $slot,
+                    'queue_number' => $queueNumber,
+                ]);
+            });
+
             return response()->json([
-                'status' => 0,
-                'message' => 'Bạn đã đặt lịch hẹn với bác sĩ này vào thời gian đó rồi!'
-            ], );
+                'status' => 1,
+                'message' => 'Tạo lịch hẹn thành công!',
+                'code' => 200,
+                'data' => $appointment,
+            ], 200);
+
+        } catch (\Exception $e) {
+            switch ($e->getMessage()) {
+                case "APPOINTMENT_ALREADY_EXISTS":
+                    return response()->json([
+                        'status' => 0,
+                        'error_code' => 'APPOINTMENT_ALREADY_EXISTS',
+                        'message' => 'Bạn đã đặt lịch hẹn với bác sĩ này trong ca đó!',
+                        'data' => null,
+                    ], 409);
+
+                case "SLOT_FULL":
+                    return response()->json([
+                        'status' => 0,
+                        'error_code' => 'SLOT_FULL',
+                        'message' => 'Ca này đã đầy, vui lòng chọn ca khác!',
+                        'data' => null,
+                    ], 422);
+
+                default:
+                    return response()->json([
+                        'status' => 0,
+                        'error_code' => 'UNKNOWN_ERROR',
+                        'message' => $e->getMessage(),
+                        'data' => null,
+                    ], 400);
+            }
         }
-
-        $queueNumber = Appointment::where('doctor_id', $validated["doctor_id"])
-            ->where('meeting_time', $validated["meeting_time"])
-            ->count() + 1;
-
-        $appointment = Appointment::create([
-            'user_id' => $validated["user_id"],
-            'doctor_id' => $validated["doctor_id"],
-            'meeting_time' => $validated["meeting_time"],
-            'queue_number' => $queueNumber
-        ]);
-
-        return response()->json([
-            'status' => 1,
-            'message' => 'Tạo lịch hẹn thành công!',
-            'data' => $appointment
-        ]);
     }
+
     public function specialties(Request $request)
     {
         $specialties = Specialties::all();
@@ -159,4 +209,63 @@ class AppointmentController extends Controller
             'data' => $schedules,
         ]);
     }
+
+    public function getDataAppointmentByUserid(Request $request, $userId)
+    {
+        try {
+            $dataAppointment = Appointment::with(['doctor', 'user', 'clinic'])
+                ->where('user_id', $userId)
+                ->get();
+
+            // \Log::info("dataAppointment: ", $dataAppointment->toArray());
+
+            if ($dataAppointment->isEmpty()) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Không tìm thấy lịch khám nào cho người dùng này',
+                    'code' => 404
+                ]);
+            }
+
+            $result = $dataAppointment->map(function ($item) {
+                return [
+                    'appointment_id' => $item->id,
+                    'meeting_time' => $item->meeting_time,
+                    'queue_number' => $item->queue_number,
+
+                    'user_id' => $item->user->id ?? null,
+                    'user_name' => $item->user
+                        ? trim(($item->user->first_name ?? '') . ' ' . ($item->user->last_name ?? ''))
+                        : null,
+
+                    'user_email' => $item->user->email ?? null,
+
+                    'doctor_id' => $item->doctor->id ?? null,
+                    'doctor_name' => $item->doctor->name ?? null,
+                    'doctor_phone' => $item->doctor->phone ?? null,
+
+                    'clinic_id' => $item->clinic->id ?? null,
+                    'clinic_name' => $item->clinic->name ?? null,
+                    'clinic_location' => $item->clinic->location ?? null,
+                ];
+            });
+
+            return response()->json([
+                'status' => 1,
+                'data' => $result,
+                'message' => 'Lấy thông tin lịch khám thành công',
+                'code' => 200
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error("getDataAppointmentByUserid error: " . $e->getMessage());
+            return response()->json([
+                'status' => 0,
+                'message' => 'Có lỗi xảy ra khi lấy dữ liệu',
+                'code' => 500
+            ]);
+        }
+    }
+
+
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Betod\Livotec\Models;
 use Model;
+use Betod\Livotec\Models\Clinics;
+use Betod\Livotec\Models\Doctor;
 
 /**
  * Model
@@ -36,6 +38,17 @@ class Appointment extends Model
             'otherKey' => 'id'
         ]
     ];
+    public function clinic()
+    {
+        return $this->hasOneThrough(
+            Clinics::class,
+            Doctor::class,
+            'id',
+            'doctor_id',
+            'doctor_id',
+            'id'
+        );
+    }
 
     public $rules = [
     ];

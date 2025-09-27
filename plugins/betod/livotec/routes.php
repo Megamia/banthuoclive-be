@@ -179,6 +179,7 @@ Route::group(['prefix' => 'apiAppointment'], function () {
     Route::get("specialties/{specialtyId}/doctors", [AppointmentController::class, 'getDoctorsBySpecialty']);
     Route::get("doctors/{doctorId}/schedules", [AppointmentController::class, 'getSchedulesByDoctorId']);
     Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
+    Route::get("getDataAppointmentByUserid/{userId}", [AppointmentController::class, 'getDataAppointmentByUserid']);
 });
 
 Route::group(['prefix' => 'apiPaypal'], function () {

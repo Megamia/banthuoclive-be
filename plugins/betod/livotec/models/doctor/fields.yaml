@@ -26,7 +26,12 @@ fields:
         label: 'Năm kinh nghiệm'
         type: datepicker
         mode: date
+        span: left
         format: 'Y'
+    phone:
+        label: Số điện thoại
+        span: auto
+        type: text
     short_description:
         label: 'Mô tả ngắn'
         size: large

@@ -1,0 +1,21 @@
+fields:
+    id:
+        label: ID
+        span: auto
+        disabled: 1
+        readOnly: 1
+        type: text
+    name:
+        label: 'Tên phòng'
+        span: auto
+        type: text
+    location:
+        label: 'Vị trí'
+        span: auto
+        type: text
+    doctor:
+        label: 'Bác sĩ'
+        span: auto
+        nameFrom: name
+        descriptionFrom: description
+        type: relation

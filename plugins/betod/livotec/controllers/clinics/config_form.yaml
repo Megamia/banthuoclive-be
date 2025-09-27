@@ -1,0 +1,10 @@
+name: Clinics
+form: $/betod/livotec/models/clinics/fields.yaml
+modelClass: Betod\Livotec\Models\Clinics
+defaultRedirect: betod/livotec/clinics
+create:
+    redirect: 'betod/livotec/clinics/update/:id'
+    redirectClose: betod/livotec/clinics
+update:
+    redirect: betod/livotec/clinics
+    redirectClose: betod/livotec/clinics

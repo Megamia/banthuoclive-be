@@ -63,3 +63,7 @@ navigation:
                 label: Appointment
                 url: betod/livotec/appointmentcontroller
                 icon: icon-sitemap
+            clinics:
+                label: Clinics
+                url: betod/livotec/clinics
+                icon: icon-sitemap
