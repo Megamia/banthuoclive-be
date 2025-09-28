@@ -58,18 +58,6 @@ if (!function_exists('attachCloudinaryUrl')) {
 }
 
 Route::group(['prefix' => 'apiProduct'], function () {
-    // Route::get("allProduct", function () {
-    //     return Cache::remember('all_products', 3600, function () {
-    //         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
-    //         return response()->json([
-    //             'allProduct' => $allProduct,
-    //             'status' => $allProduct->isNotEmpty() ? 1 : 0
-    //         ]);
-    //     });
-    // });
-    // Route::get("testabc", function () {
-    //     return 'ok';
-    // });
     Route::get("allProduct", function () {
         $allProduct = Product::with(['gallery', 'image', 'category.parent', 'post', 'ingredientsAndInstructions'])->get();
 
@@ -150,26 +138,9 @@ Route::group(['prefix' => 'apiCategory'], function () {
 
 Route::group(['prefix' => 'apiOrder'], function () {
     Route::post('createOrder', 'Betod\Livotec\Controllers\OrderController@createOrder');
-
-    Route::get('order/{order_code}', function ($order_code) {
-        return Orders::with('orderdetail.product')->where('order_code', $order_code)->first();
-    });
-    Route::get('allDataOrder/{id}', function ($id) {
-        return Orders::with('orderdetail.product')->where('user_id', $id)->get();
-    });
-    Route::post("/updateStatus/{order_code}", function ($order_code) {
-        $order = Orders::where('order_code', $order_code)->first();
-
-        if ($order) {
-            $order->update(['status_id' => "2"]);
-            return response()->json([
-                "message" => "Cập nhật trạng thái thành công",
-                "data" => $order
-            ], 200);
-        } else {
-            return response()->json(["message" => "Không tìm thấy đơn hàng"], 404);
-        }
-    });
+    Route::get('getDataOrder/{order_code}', [\Betod\Livotec\Controllers\OrderController::class, 'getDataOrder']);
+    Route::get('getAllDataOrder/{id}', [\Betod\Livotec\Controllers\OrderController::class, 'getAllDataOrder']);
+    Route::post("updateStatusOrder/{order_code}", [\Betod\Livotec\Controllers\OrderController::class, 'updateStatusOrder']);
 });
 
 Route::group(['prefix' => 'apiAppointment'], function () {

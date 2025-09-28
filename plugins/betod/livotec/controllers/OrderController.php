@@ -232,4 +232,62 @@ class OrderController extends Controller
 
         return true;
     }
+
+    public function getDataOrder(Request $request, $order_code)
+    {
+        $dataOrder = Orders::with('orderdetail.product')
+            ->where('order_code', $order_code)
+            ->first();
+
+        if (!$dataOrder) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Lấy thông tin đơn hàng thất bại'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Lấy danh sách đơn hàng thành công',
+            'dataOrder' => $dataOrder
+        ]);
+    }
+    public function getAllDataOrder(Request $request, $user_id)
+    {
+        $allDataOrder = Orders::with('orderdetail.product')
+            ->where('user_id', $user_id)
+            ->get();
+
+        if ($allDataOrder->isEmpty()) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Lấy thông tin tất cả đơn hàng thất bại'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Lấy danh sách tất cả đơn hàng thành công',
+            'allDataOrder' => $allDataOrder
+        ]);
+    }
+    public function updateStatusOrder(Request $request, $order_code)
+    {
+        $order = Orders::where('order_code', $order_code)->first();
+
+        if (!$order) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Không tìm thấy đơn hàng'
+            ]);
+        }
+
+        $order->update(['status_id' => 2]);
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Cập nhật trạng thái thành công',
+            'data' => $order
+        ]);
+    }
 }

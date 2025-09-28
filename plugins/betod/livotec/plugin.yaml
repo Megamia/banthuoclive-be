@@ -41,11 +41,11 @@ navigation:
             orderDetail:
                 label: OrderDetail
                 url: betod/livotec/orderdetail
-                icon: icon-sitemap
+                icon: icon-info-circle
     doctor:
         label: Appointment
         url: /
-        icon: icon-life-ring
+        icon: icon-calendar-o
         sideMenu:
             doctor:
                 label: Doctor
@@ -62,8 +62,8 @@ navigation:
             appointment:
                 label: Appointment
                 url: betod/livotec/appointmentcontroller
-                icon: icon-sitemap
+                icon: icon-calendar
             clinics:
                 label: Clinics
                 url: betod/livotec/clinics
-                icon: icon-sitemap
+                icon: icon-location-arrow
