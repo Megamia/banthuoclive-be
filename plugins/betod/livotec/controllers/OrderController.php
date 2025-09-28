@@ -37,7 +37,7 @@ class OrderController extends Controller
             'email' => 'required|email|max:255',
             'province' => 'required|integer',
             'district' => 'required|integer',
-            'subdistrict' => 'required|integer',
+            'subdistrict' => 'required|string|max:255',
             'address' => 'required|string|max:500',
             'diffname' => 'nullable|string|max:255',
             'diffphone' => [
@@ -46,7 +46,7 @@ class OrderController extends Controller
             ],
             'diffprovince' => 'nullable|integer',
             'diffdistrict' => 'nullable|integer',
-            'diffsubdistrict' => 'nullable|integer',
+            'diffsubdistrict' => 'nullable|string|max:255',
             'diffaddress' => 'nullable|string|max:500',
             'notes' => 'nullable|string|max:1000',
             'terms' => 'required|boolean',
@@ -136,7 +136,7 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error creating order: ' . $e->getMessage());
+            // \Log::error('Error creating order: ' . $e->getMessage());
             return response()->json([
                 'code' => 500,
                 'message' => 'Lỗi hệ thống, tạo đơn không thành công.',
@@ -150,7 +150,7 @@ class OrderController extends Controller
     {
         $provinceId = (int) trim($validatedData['province']);
         $districtId = (int) trim($validatedData['district']);
-        $subdistrictId = (int) trim($validatedData['subdistrict']);
+        $subdistrictId = trim((string) $validatedData['subdistrict']);
 
         if (!$this->isValidShippingArea($provinceId, $districtId, $subdistrictId)) {
             return ['code' => 400, 'message' => 'Invalid shipping area'];
@@ -211,8 +211,7 @@ class OrderController extends Controller
                 'data' => $result['data'] ?? null,
             ];
         }
-        \Log::warning('GHN create order response: ', $result);
-
+        // \Log::warning('GHN create order response: ', $result);
 
         return $result;
     }

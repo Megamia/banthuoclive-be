@@ -19,7 +19,7 @@ class GhnController extends Controller
         $baseUrl = env('GHN_BASE_URL');
 
         if (!$apiKey || !$baseUrl) {
-            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            // \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
             return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
@@ -32,13 +32,13 @@ class GhnController extends Controller
             $data = $response->json();
 
             if (empty($data['data'])) {
-                \Log::warning("GHN API response missing 'data': " . json_encode($data));
+                // \Log::warning("GHN API response missing 'data': " . json_encode($data));
                 return response()->json(['data' => []]);
             }
 
             return response()->json(['status' => 1, 'data' => $data['data']]);
         } catch (\Exception $e) {
-            \Log::error("Failed to fetch GHN provinces: " . $e->getMessage());
+            // \Log::error("Failed to fetch GHN provinces: " . $e->getMessage());
             return response()->json(['data' => [], 'message' => 'Failed to fetch GHN provinces'], 500);
         }
     }
@@ -49,12 +49,12 @@ class GhnController extends Controller
         $baseUrl = env('GHN_BASE_URL');
 
         if (!$provinceId) {
-            \Log::warning("getDistricts called with empty provinceId");
+            // \Log::warning("getDistricts called with empty provinceId");
             return response()->json(['data' => []]);
         }
 
         if (!$apiKey || !$baseUrl) {
-            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            // \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
             return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
@@ -69,13 +69,13 @@ class GhnController extends Controller
             $data = $response->json();
 
             if (empty($data['data'])) {
-                \Log::warning("GHN API response missing 'data' or empty for provinceId {$provinceId}: " . json_encode($data));
+                // \Log::warning("GHN API response missing 'data' or empty for provinceId {$provinceId}: " . json_encode($data));
                 return response()->json(['data' => []]);
             }
 
             return response()->json(['status' => 1, 'data' => $data['data']]);
         } catch (\Exception $e) {
-            \Log::error("Failed to fetch districts for provinceId {$provinceId}: " . $e->getMessage());
+            // \Log::error("Failed to fetch districts for provinceId {$provinceId}: " . $e->getMessage());
             return response()->json(['data' => [], 'message' => 'Failed to fetch districts'], 500);
         }
     }
@@ -94,12 +94,12 @@ class GhnController extends Controller
         }
 
         if (!$districtId) {
-            \Log::warning("getWards called with empty districtId");
+            // \Log::warning("getWards called with empty districtId");
             return response()->json(['data' => []]);
         }
 
         if (!$apiKey || !$baseUrl) {
-            \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
+            // \Log::error("GHN_API_KEY or GHN_BASE_URL is missing");
             return response()->json(['data' => [], 'message' => 'GHN config missing'], 500);
         }
 
@@ -114,13 +114,13 @@ class GhnController extends Controller
             $data = $response->json();
 
             if (empty($data['data'])) {
-                \Log::warning("GHN API response missing 'data' or empty for districtId {$districtId}: " . json_encode($data));
+                // \Log::warning("GHN API response missing 'data' or empty for districtId {$districtId}: " . json_encode($data));
                 return response()->json(['data' => []]);
             }
 
             return response()->json(['status' => 1, 'data' => $data['data']]);
         } catch (\Exception $e) {
-            \Log::error("Failed to fetch wards for districtId {$districtId}: " . $e->getMessage());
+            // \Log::error("Failed to fetch wards for districtId {$districtId}: " . $e->getMessage());
             return response()->json(['data' => [], 'message' => 'Failed to fetch wards'], 500);
         }
     }
@@ -136,7 +136,7 @@ class GhnController extends Controller
     public function findProvinceById($provinceId)
     {
         if (empty($provinceId)) {
-            \Log::warning("findProvinceById called with empty provinceId");
+            // \Log::warning("findProvinceById called with empty provinceId");
             return null;
         }
 
@@ -144,7 +144,7 @@ class GhnController extends Controller
         $data = $response->getData(true);
 
         if (empty($data['data'])) {
-            \Log::warning("No provinces found");
+            // \Log::warning("No provinces found");
             return null;
         }
 
@@ -154,7 +154,7 @@ class GhnController extends Controller
             }
         }
 
-        \Log::warning("Province not found by ID: $provinceId");
+        // \Log::warning("Province not found by ID: $provinceId");
         return null;
     }
 
@@ -162,19 +162,19 @@ class GhnController extends Controller
     public function findDistrictById($provinceId, $districtId)
     {
         if (empty($provinceId)) {
-            \Log::warning("findDistrictById called with empty provinceId");
+            // \Log::warning("findDistrictById called with empty provinceId");
             return null;
         }
         if (empty($districtId)) {
-            \Log::warning("findDistrictById called with empty districtId");
+            // \Log::warning("findDistrictById called with empty districtId");
             return null;
         }
 
         $response = $this->getDistricts($provinceId);
         $data = $response->getData(true);
-        
+
         if (empty($data['data'])) {
-            \Log::warning("No districts found for provinceId: $provinceId");
+            // \Log::warning("No districts found for provinceId: $provinceId");
             return null;
         }
 
@@ -184,18 +184,18 @@ class GhnController extends Controller
             }
         }
 
-        \Log::warning("District not found by ID: $districtId");
+        // \Log::warning("District not found by ID: $districtId");
         return null;
     }
 
     public function findWardCodeById($districtId, $subdistrictId)
     {
         if (empty($districtId)) {
-            \Log::warning("findWardCodeById called with empty districtId");
+            // \Log::warning("findWardCodeById called with empty districtId");
             return null;
         }
         if (empty($subdistrictId)) {
-            \Log::warning("findWardCodeById called with empty wardId");
+            // \Log::warning("findWardCodeById called with empty wardId");
             return null;
         }
 
@@ -203,17 +203,20 @@ class GhnController extends Controller
         $data = $response->getData(true);
 
         if (empty($data['data']) || !is_array($data['data'])) {
-            \Log::warning("No wards data or data format invalid for districtId: $districtId");
+            // \Log::warning("No wards data or data format invalid for districtId: $districtId");
             return null;
         }
 
         foreach ($data['data'] as $ward) {
-            if (array_key_exists('WardCode', $ward) && $ward['WardCode'] == $subdistrictId) {
-                return $ward['WardCode'] ?? null;
+            if (
+                array_key_exists('WardCode', $ward) &&
+                (string) $ward['WardCode'] === (string) $subdistrictId
+            ) {
+                return (string) $ward['WardCode'];
             }
         }
 
-        \Log::warning("Ward not found by ID: $subdistrictId");
+        // \Log::warning("Ward not found by ID: $subdistrictId");
         return null;
     }
 
