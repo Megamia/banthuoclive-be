@@ -261,7 +261,7 @@ class AppointmentController extends Controller
             \Log::error("getDataAppointmentByUserid error: " . $e->getMessage());
             return response()->json([
                 'status' => 0,
-                'message' => 'Có lỗi xảy ra khi lấy dữ liệu',
+                'message' => $e->getMessage(),
                 'code' => 500
             ]);
         }
