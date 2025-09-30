@@ -28,9 +28,9 @@ class AppointmentController extends Controller
         BackendMenu::setContext('Betod.Livotec', 'doctor', 'appointment');
     }
 
-    public function getAllDoctor(Request $request)
+    public function getDataAllDoctor(Request $request)
     {
-        $allDataDoctor = Doctor::with('image')->get();
+        $allDataDoctor = Doctor::with('image', 'specialties')->get();
 
         if ($allDataDoctor->isNotEmpty()) {
             $allDataDoctor = $allDataDoctor->map(function ($doctor) {
@@ -51,7 +51,7 @@ class AppointmentController extends Controller
     }
 
 
-    public function getAllDataDoctorById(Request $request, $doctorId)
+    public function getDataAllDoctorById(Request $request, $doctorId)
     {
         $dataDoctor = Doctor::with(['image'])
             ->where('id', $doctorId)
@@ -184,7 +184,7 @@ class AppointmentController extends Controller
     }
 
 
-    public function specialties(Request $request)
+    public function getDataAllSpecialties(Request $request)
     {
         $specialties = Specialties::all();
 
@@ -216,21 +216,31 @@ class AppointmentController extends Controller
     }
     public function getSchedulesByDoctorId(Request $request, $doctorId)
     {
-        $schedules = Schedules::where('doctor_id', $doctorId)
-            ->orderBy('day_of_week', 'asc')
-            ->orderBy('start_time', 'asc')
-            ->get();
-        if ($schedules->isEmpty()) {
+        try {
+            $schedules = Schedules::where('doctor_id', $doctorId)
+                ->orderBy('day_of_week', 'asc')
+                ->orderBy('start_time', 'asc')
+                ->get();
+
+            if ($schedules->isEmpty()) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Không tìm thấy lịch làm việc',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Lấy lịch làm việc thành công',
+                'data' => $schedules,
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 0,
-                'message' => 'Lấy lịch làm việc thất bại',
-            ]);
+                'message' => 'Lỗi server: ' . $e->getMessage(),
+            ], 500);
         }
-        return response()->json([
-            'status' => 1,
-            'message' => 'Lấy lịch làm việc thành công',
-            'data' => $schedules,
-        ]);
+
     }
 
     public function getDataAppointmentByUserid(Request $request, $userId)

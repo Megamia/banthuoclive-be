@@ -24,6 +24,14 @@ class Schedules extends Model
     /**
      * @var array rules for validation.
      */
+
+    protected $fillable = [
+        'doctor_id',
+        'day_of_week',
+        'start_time',
+        'end_time',
+    ];
+
     public $belongsTo = [
         'doctor' => [
             'Betod\Livotec\Models\Doctor',

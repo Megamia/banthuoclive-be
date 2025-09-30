@@ -25,6 +25,13 @@ class Doctor extends Model
      * @var array rules for validation.
      */
 
+    protected $fillable = [
+        'name',
+        'phone',
+        'experience_year',
+        'short_description'
+    ];
+
     public $attachOne = [
         'image' => 'System\Models\File'
     ];

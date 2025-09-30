@@ -144,9 +144,9 @@ Route::group(['prefix' => 'apiOrder'], function () {
 });
 
 Route::group(['prefix' => 'apiAppointment'], function () {
-    Route::get("getAllDoctor", [AppointmentController::class, 'getAllDoctor']);
-    Route::get("getAllDataDoctorById/{doctorId}", [AppointmentController::class, 'getAllDataDoctorById']);
-    Route::get("specialties", [AppointmentController::class, 'specialties']);
+    Route::get("getDataAllDoctor", [AppointmentController::class, 'getDataAllDoctor']);
+    Route::get("getDataAllDoctorById/{doctorId}", [AppointmentController::class, 'getDataAllDoctorById']);
+    Route::get("getDataAllSpecialties", [AppointmentController::class, 'getDataAllSpecialties']);
     Route::get("specialties/{specialtyId}/doctors", [AppointmentController::class, 'getDoctorsBySpecialty']);
     Route::get("doctors/{doctorId}/schedules", [AppointmentController::class, 'getSchedulesByDoctorId']);
     Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
@@ -160,6 +160,7 @@ Route::group(['prefix' => 'apiPaypal'], function () {
 
 Route::group(['prefix' => 'apiImport'], function () {
     Route::post('import', [\Betod\Livotec\Controllers\Product\ImportCSV::class, 'importCsv']);
+    Route::post('importCsvSchedules', [\Betod\Livotec\Controllers\Schedules\ImportCsvSchedules::class, 'importCsvSchedules']);
     Route::post('import-category', [\Betod\Livotec\Controllers\Category\ImportCSV::class, 'importCsv']);
 });
 
