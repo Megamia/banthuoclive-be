@@ -17,7 +17,7 @@ class Clinics extends Controller
     public function __construct()
     {
         parent::__construct();
-        BackendMenu::setContext('Betod.Livotec', 'doctor', 'clinics');
+        BackendMenu::setContext('Betod.Livotec', 'clinics', 'clinics');
     }
 
 }

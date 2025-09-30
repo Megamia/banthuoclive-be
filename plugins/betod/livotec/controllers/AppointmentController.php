@@ -10,6 +10,7 @@ use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -88,6 +89,7 @@ class AppointmentController extends Controller
                 $timestamp = strtotime($validated['meeting_time']);
                 $minutes = date('i', $timestamp);
                 $roundedMinutes = floor($minutes / 30) * 30;
+
                 $slot = date(
                     'Y-m-d H:' . str_pad($roundedMinutes, 2, '0', STR_PAD_LEFT) . ':00',
                     $timestamp
@@ -104,7 +106,7 @@ class AppointmentController extends Controller
                 }
 
                 $doctor = Doctor::find($validated['doctor_id']);
-                $capacityPerSlot = $doctor->capacity_per_slot ?? 5;
+                $capacityPerSlot = $doctor?->capacity_per_slot ?? 5;
 
                 $countInSlot = Appointment::where('doctor_id', $validated['doctor_id'])
                     ->where('meeting_time', $slot)
@@ -124,6 +126,26 @@ class AppointmentController extends Controller
                     'queue_number' => $queueNumber,
                 ]);
             });
+
+            $user = $appointment->user;
+            $doctor = $appointment->doctor;
+            $clinic = \Betod\Livotec\Models\Clinics::where('doctor_id', $doctor->id)->first();
+
+            if ($user?->email) {
+
+                Mail::send('betod.livotec::mail.appointment_confirm', [
+                    'user_name' => trim(($user?->first_name ?? '') . ' ' . ($user?->last_name ?? '')),
+                    'doctor_name' => $doctor?->name ?? 'Bác sĩ',
+                    'meeting_time' => $appointment->meeting_time,
+                    'queue_number' => $appointment->queue_number,
+                    'clinic_name' => $clinic?->name ?? '',
+                    'clinic_location' => $clinic?->location ?? '',
+                ], function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Xác nhận lịch hẹn khám');
+                });
+            }
+
 
             return response()->json([
                 'status' => 1,
@@ -160,6 +182,7 @@ class AppointmentController extends Controller
             }
         }
     }
+
 
     public function specialties(Request $request)
     {
@@ -217,8 +240,6 @@ class AppointmentController extends Controller
                 ->where('user_id', $userId)
                 ->get();
 
-            // \Log::info("dataAppointment: ", $dataAppointment->toArray());
-
             if ($dataAppointment->isEmpty()) {
                 return response()->json([
                     'status' => 0,
@@ -258,7 +279,7 @@ class AppointmentController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("getDataAppointmentByUserid error: " . $e->getMessage());
+            // \Log::error("getDataAppointmentByUserid error: " . $e->getMessage());
             return response()->json([
                 'status' => 0,
                 'message' => $e->getMessage(),
