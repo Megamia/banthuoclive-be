@@ -59,6 +59,7 @@ class OrderController extends Controller
                 'items.*.price' => 'required|numeric|min:0',
                 'paypal_order_id' => 'nullable|string|max:500',
                 'zalopay_app_trans_id' => 'nullable|string|max:500',
+                'vnpay_order_id ' => 'nullable|string|max:500',
             ]);
 
 
@@ -76,6 +77,10 @@ class OrderController extends Controller
             } elseif ($request->has('zalopay_app_trans_id')) {
                 $propertyData['paymenttype'] = 1;
                 $propertyData['payment_gateway'] = 'zalopay';
+                $propertyData['payment_order_id'] = $request->input('zalopay_app_trans_id');
+            } elseif ($request->has('vnpay_order_id ')) {
+                $propertyData['paymenttype'] = 1;
+                $propertyData['payment_gateway'] = 'vnpay';
                 $propertyData['payment_order_id'] = $request->input('zalopay_app_trans_id');
             } else {
                 $propertyData['paymenttype'] = 2;

@@ -2,7 +2,9 @@
 
 use Betod\Livotec\Controllers\AppointmentController;
 use Betod\Livotec\Controllers\GhnController;
+use Betod\Livotec\Controllers\MomoController;
 use Betod\Livotec\Controllers\OrderController;
+use Betod\Livotec\Controllers\VnpayController;
 use Betod\Livotec\Controllers\ZaloPayController;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
@@ -174,4 +176,10 @@ Route::group(['prefix' => 'api/zalopay'], function () {
     Route::post('/create-order', [ZaloPayController::class, 'createOrder']);
     Route::post('/notify', [ZaloPayController::class, 'notify']);
     Route::post('/query-order', [ZaloPayController::class, 'queryOrder']);
+});
+
+Route::group(['prefix' => 'api/vnpay'], function () {
+    Route::post('/create-order', [VnpayController::class, 'createOrder']);
+    Route::get('/return', [VnpayController::class, 'return']);
+    Route::post('/query-order', [VnpayController::class, 'queryOrder']);
 });
