@@ -8,7 +8,6 @@ use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Orders;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
@@ -27,53 +26,63 @@ class OrderController extends Controller
 
     public function createOrder(Request $request)
     {
-        $validatedData = $request->validate([
-            'user_id' => 'nullable|integer',
-            'name' => 'required|string|max:255',
-            'phone' => [
-                'required',
-                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
-            ],
-            'email' => 'required|email|max:255',
-            'province' => 'required|integer',
-            'district' => 'required|integer',
-            'subdistrict' => 'required|string|max:255',
-            'address' => 'required|string|max:500',
-            'diffname' => 'nullable|string|max:255',
-            'diffphone' => [
-                'nullable',
-                'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
-            ],
-            'diffprovince' => 'nullable|integer',
-            'diffdistrict' => 'nullable|integer',
-            'diffsubdistrict' => 'nullable|string|max:255',
-            'diffaddress' => 'nullable|string|max:500',
-            'notes' => 'nullable|string|max:1000',
-            'terms' => 'required|boolean',
-            'paymenttype' => 'required|integer',
-            'differentaddresschecked' => 'required|boolean',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|integer',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-            'paypal_order_id' => 'nullable|string|max:500',
-        ]);
-
-        // \Log::info("Validated data: ", $validatedData);
-
-        $totalPrice = array_reduce($validatedData['items'], function ($sum, $item) {
-            return $sum + $item['price'] * $item['quantity'];
-        }, 0);
-
-        $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
-        $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
-
-        if ($request->has('paypal_order_id')) {
-            $propertyData['paymenttype'] = 1;
-            $propertyData['paypal_order_id'] = $request->input('paypal_order_id');
-        }
 
         try {
+            $validatedData = $request->validate([
+                'user_id' => 'nullable|integer',
+                'name' => 'required|string|max:255',
+                'phone' => [
+                    'required',
+                    'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
+                ],
+                'email' => 'required|email|max:255',
+                'province' => 'required|integer',
+                'district' => 'required|integer',
+                'subdistrict' => 'required|string|max:255',
+                'address' => 'required|string|max:500',
+                'diffname' => 'nullable|string|max:255',
+                'diffphone' => [
+                    'nullable',
+                    'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'
+                ],
+                'diffprovince' => 'nullable|integer',
+                'diffdistrict' => 'nullable|integer',
+                'diffsubdistrict' => 'nullable|string|max:255',
+                'diffaddress' => 'nullable|string|max:500',
+                'notes' => 'nullable|string|max:1000',
+                'terms' => 'required|boolean',
+                'paymenttype' => 'required|integer',
+                'differentaddresschecked' => 'required|boolean',
+                'items' => 'required|array|min:1',
+                'items.*.product_id' => 'required|integer',
+                'items.*.quantity' => 'required|integer|min:1',
+                'items.*.price' => 'required|numeric|min:0',
+                'paypal_order_id' => 'nullable|string|max:500',
+                'zalopay_app_trans_id' => 'nullable|string|max:500',
+            ]);
+
+
+            $totalPrice = array_reduce($validatedData['items'], function ($sum, $item) {
+                return $sum + $item['price'] * $item['quantity'];
+            }, 0);
+
+            $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+            $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
+
+            if ($request->has('paypal_order_id')) {
+                $propertyData['paymenttype'] = 1;
+                $propertyData['payment_gateway'] = 'paypal';
+                $propertyData['payment_order_id'] = $request->input('paypal_order_id');
+            } elseif ($request->has('zalopay_app_trans_id')) {
+                $propertyData['paymenttype'] = 1;
+                $propertyData['payment_gateway'] = 'zalopay';
+                $propertyData['payment_order_id'] = $request->input('zalopay_app_trans_id');
+            } else {
+                $propertyData['paymenttype'] = 2;
+                $propertyData['payment_gateway'] = 'cod';
+            }
+
+
             DB::beginTransaction();
 
             $ghnItems = collect($validatedData['items'])->map(function ($item) {
@@ -85,11 +94,9 @@ class OrderController extends Controller
                 ];
             })->toArray();
 
-            // \Log::info("Creating GHN order for order_code: {$orderCode}");
 
             $ghnResponse = $this->createGhnOrderForItems($validatedData, $ghnItems, $orderCode);
 
-            // \Log::info("GHN Response: ", $ghnResponse);
 
             if (!isset($ghnResponse['code']) || $ghnResponse['code'] !== 200) {
                 DB::rollBack();
@@ -106,6 +113,7 @@ class OrderController extends Controller
                 'property' => $propertyData,
                 'ghn_order_code' => $ghnResponse['data']['order_code'] ?? 'DEFAULT_CODE'
             ]);
+
 
             foreach ($validatedData['items'] as $item) {
                 OrderDetail::create([
@@ -136,12 +144,10 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            // \Log::error('Error creating order: ' . $e->getMessage());
             return response()->json([
                 'code' => 500,
                 'message' => 'Lỗi hệ thống, tạo đơn không thành công.',
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ], 500);
         }
     }

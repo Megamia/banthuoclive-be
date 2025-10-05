@@ -2,15 +2,11 @@
 
 use Betod\Livotec\Controllers\AppointmentController;
 use Betod\Livotec\Controllers\GhnController;
-use Betod\Livotec\Models\Doctor;
-// use Betod\Livotec\Models\IngredientsAndInstructions;
-use Betod\Livotec\Models\Orders;
+use Betod\Livotec\Controllers\OrderController;
+use Betod\Livotec\Controllers\ZaloPayController;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
 use Betod\Livotec\Controllers\PayPalController;
-// use Betod\Livotec\Controllers\UploadController;
-use Betod\Livotec\Models\Schedules;
-use Betod\Livotec\Models\Specialties;
 use Illuminate\Support\Facades\Route;
 
 if (!function_exists('imagePathToRelative')) {
@@ -28,7 +24,7 @@ if (!function_exists('getCloudinaryUrlFromDiskName')) {
             : env('CLOUDINARY_CLOUD_NAME');
 
         if (!$cloudName) {
-            \Log::warning("⚠️ Không lấy được cloud_name từ config.");
+            \Log::warning("Không lấy được cloud_name từ config.");
             return null;
         }
 
@@ -137,10 +133,10 @@ Route::group(['prefix' => 'apiCategory'], function () {
 });
 
 Route::group(['prefix' => 'apiOrder'], function () {
-    Route::post('createOrder', 'Betod\Livotec\Controllers\OrderController@createOrder');
-    Route::get('getDataOrder/{order_code}', [\Betod\Livotec\Controllers\OrderController::class, 'getDataOrder']);
-    Route::get('getAllDataOrder/{id}', [\Betod\Livotec\Controllers\OrderController::class, 'getAllDataOrder']);
-    Route::post("updateStatusOrder/{order_code}", [\Betod\Livotec\Controllers\OrderController::class, 'updateStatusOrder']);
+    Route::post('createOrder', [OrderController::class, 'createOrder']);
+    Route::get('getDataOrder/{order_code}', [OrderController::class, 'getDataOrder']);
+    Route::get('getAllDataOrder/{id}', [OrderController::class, 'getAllDataOrder']);
+    Route::post("updateStatusOrder/{order_code}", [OrderController::class, 'updateStatusOrder']);
 });
 
 Route::group(['prefix' => 'apiAppointment'], function () {
@@ -172,4 +168,10 @@ Route::group(['prefix' => 'apiGHN'], function () {
     Route::get('/ghn/provinces', [GhnController::class, 'getProvinces']);
     Route::get('/ghn/districts/{province_id}', [GhnController::class, 'getDistricts']);
     Route::get('/ghn/wards/{district_id}', [GhnController::class, 'getWards']);
+});
+
+Route::group(['prefix' => 'api/zalopay'], function () {
+    Route::post('/create-order', [ZaloPayController::class, 'createOrder']);
+    Route::post('/notify', [ZaloPayController::class, 'notify']);
+    Route::post('/query-order', [ZaloPayController::class, 'queryOrder']);
 });
