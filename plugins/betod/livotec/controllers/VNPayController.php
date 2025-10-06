@@ -1,7 +1,7 @@
 <?php
 namespace Betod\Livotec\Controllers;
 
-use Illuminate\Routing\Controller;
+use Backend\Classes\Controller;
 use Illuminate\Http\Request;
 
 class VnPayController extends Controller
@@ -122,5 +122,9 @@ class VnPayController extends Controller
         } else {
             return response()->json(['RspCode' => '97', 'Message' => 'Invalid Signature']);
         }
+    }
+    public function testapi(Request $request)
+    {
+        return response()->json(['data' => "ok"]);
     }
 }
