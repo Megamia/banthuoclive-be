@@ -8,55 +8,65 @@ class VnpayController extends Controller
 {
     public function createOrder(Request $request)
     {
-        $vnp_TmnCode = trim(env('VNPAY_TMN_CODE'));
-        $vnp_HashSecret = trim(env('VNPAY_HASH_SECRET'));
-        $vnp_Url = trim(env('VNPAY_URL'));
-        $vnp_Returnurl = trim(env('VNPAY_RETURN_URL'));
+        try {
+            $vnp_TmnCode = trim(env('VNPAY_TMN_CODE'));
+            $vnp_HashSecret = trim(env('VNPAY_HASH_SECRET'));
+            $vnp_Url = trim(env('VNPAY_URL'));
+            $vnp_Returnurl = trim(env('VNPAY_RETURN_URL'));
 
-        $vnp_TxnRef = (string) time(); 
-        $vnp_OrderInfo = $request->input('orderInfo', "Thanh toán đơn hàng test");
-        $vnp_Amount = intval($request->input('amount', 10000)) * 100;
-        $vnp_Locale = $request->input('locale', 'vn');
-        $vnp_IpAddr = $request->ip();
-        $vnp_OrderType = "billpayment";
+            $vnp_TxnRef = (string) time();
+            $vnp_OrderInfo = $request->input('orderInfo', "Thanh toán đơn hàng test");
+            $vnp_Amount = intval($request->input('amount', 10000)) * 100;
+            $vnp_Locale = $request->input('locale', 'vn');
+            $vnp_IpAddr = $request->ip();
+            $vnp_OrderType = "billpayment";
 
-        $inputData = [
-            "vnp_Version" => "2.1.0",
-            "vnp_TmnCode" => $vnp_TmnCode,
-            "vnp_Amount" => $vnp_Amount,
-            "vnp_Command" => "pay",
-            "vnp_CreateDate" => date('YmdHis'),
-            "vnp_CurrCode" => "VND",
-            "vnp_IpAddr" => $vnp_IpAddr,
-            "vnp_Locale" => $vnp_Locale,
-            "vnp_OrderInfo" => $vnp_OrderInfo,
-            "vnp_OrderType" => $vnp_OrderType,
-            "vnp_ReturnUrl" => $vnp_Returnurl,
-            "vnp_TxnRef" => $vnp_TxnRef,
-        ];
+            $inputData = [
+                "vnp_Version" => "2.1.0",
+                "vnp_TmnCode" => $vnp_TmnCode,
+                "vnp_Amount" => $vnp_Amount,
+                "vnp_Command" => "pay",
+                "vnp_CreateDate" => date('YmdHis'),
+                "vnp_CurrCode" => "VND",
+                "vnp_IpAddr" => $vnp_IpAddr,
+                "vnp_Locale" => $vnp_Locale,
+                "vnp_OrderInfo" => $vnp_OrderInfo,
+                "vnp_OrderType" => $vnp_OrderType,
+                "vnp_ReturnUrl" => $vnp_Returnurl,
+                "vnp_TxnRef" => $vnp_TxnRef,
+            ];
 
-        ksort($inputData);
+            ksort($inputData);
 
-        $hashDataArr = [];
-        foreach ($inputData as $key => $value) {
-            $hashDataArr[] = urlencode($key) . "=" . urlencode($value);
+            $hashDataArr = [];
+            foreach ($inputData as $key => $value) {
+                $hashDataArr[] = urlencode($key) . "=" . urlencode($value);
+            }
+            $hashData = implode('&', $hashDataArr);
+
+            $vnp_SecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
+
+            $query = http_build_query($inputData);
+            $redirectUrl = $vnp_Url . "?" . $query . "&vnp_SecureHash=" . $vnp_SecureHash;
+
+            return response()->json([
+                'code' => '00',
+                'message' => 'success',
+                'data' => [
+                    'payUrl' => $redirectUrl,
+                    'orderId' => $vnp_TxnRef,
+                    'amount' => $vnp_Amount,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('VNPAY createOrder error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
-        $hashData = implode('&', $hashDataArr);
-
-        $vnp_SecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
-        $query = http_build_query($inputData);
-        $redirectUrl = $vnp_Url . "?" . $query . "&vnp_SecureHash=" . $vnp_SecureHash;
-
-        return response()->json([
-            'code' => '00',
-            'message' => 'success',
-            'data' => [
-                'payUrl' => $redirectUrl,
-                'orderId' => $vnp_TxnRef,
-                'amount' => $vnp_Amount,
-            ]
-        ]);
     }
 
     public function return(Request $request)
