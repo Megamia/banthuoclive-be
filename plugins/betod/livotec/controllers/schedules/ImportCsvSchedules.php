@@ -3,7 +3,6 @@
 namespace Betod\Livotec\Controllers\Schedules;
 
 use Illuminate\Routing\Controller;
-use Illuminate\Http\Request;
 use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Doctor;
 use League\Csv\Reader;
