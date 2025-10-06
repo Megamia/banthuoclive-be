@@ -182,4 +182,12 @@ Route::group(['prefix' => 'api/vnpay'], function () {
     Route::post('/create-order', [VnpayController::class, 'createOrder']);
     Route::get('/return', [VnpayController::class, 'return']);
     Route::post('/query-order', [VnpayController::class, 'queryOrder']);
+    Route::get('/debug-env', function () {
+        return response()->json([
+            'VNPAY_TMN_CODE' => env('VNPAY_TMN_CODE'),
+            'VNPAY_HASH_SECRET' => env('VNPAY_HASH_SECRET'),
+            'VNPAY_URL' => env('VNPAY_URL'),
+            'VNPAY_RETURN_URL' => env('VNPAY_RETURN_URL'),
+        ]);
+    });
 });
