@@ -3,7 +3,7 @@
 use Betod\Livotec\Controllers\AppointmentController;
 use Betod\Livotec\Controllers\GhnController;
 use Betod\Livotec\Controllers\OrderController;
-// use Betod\Livotec\Controllers\VnPayController;
+use Betod\Livotec\Controllers\VnPayController;
 use Betod\Livotec\Controllers\ZaloPayController;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Category;
@@ -148,6 +148,8 @@ Route::group(['prefix' => 'apiAppointment'], function () {
     Route::get("doctors/{doctorId}/schedules", [AppointmentController::class, 'getSchedulesByDoctorId']);
     Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
     Route::get("getDataAppointmentByUserid/{userId}", [AppointmentController::class, 'getDataAppointmentByUserid']);
+    Route::get("testapi", [AppointmentController::class, 'testapi']);
+
 });
 
 Route::group(['prefix' => 'apiPaypal'], function () {
@@ -178,7 +180,7 @@ Route::group(['prefix' => 'api/zalopay'], function () {
 });
 
 Route::group(['prefix' => 'api/vnpay'], function () {
-    Route::post('/create-order', [\Betod\Livotec\Controllers\VnPayController::class, 'createOrder']);
-    Route::get('/return', [\Betod\Livotec\Controllers\VnPayController::class, 'return']);
+    Route::post('/create-order', [VnPayController::class, 'createOrder']);
+    Route::get('/return', [VnPayController::class, 'return']);
     // Route::post('/query-order', [VnPayController::class, 'queryOrder']);
 });
