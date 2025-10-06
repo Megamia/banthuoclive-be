@@ -17,7 +17,8 @@
         <?= e(trans('backend::lang.list.delete_selected')) ?>
     </button>
     <script>
-        document.getElementById('importCsvInput').addEventListener('change', function (event) {
+        const APP_URL_API = "<?php echo env('APP_URL_API'); ?>";
+        document.getElementById('ImportCsvInput').addEventListener('change', function (event) {
             event.preventDefault();
             let formData = new FormData();
             formData.append('csv_file', this.files[0]);
@@ -25,7 +26,7 @@
             let csrfToken = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
             csrfToken = csrfToken ? csrfToken[1] : '';
 
-            fetch('http://127.0.0.1:8000/apiImport/import-category', {
+            fetch(`${APP_URL_API}/apiImport/import-category`, {
                 method: 'POST',
                 body: formData,
                 headers: {
