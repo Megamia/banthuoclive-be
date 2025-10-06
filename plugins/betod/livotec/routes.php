@@ -1,8 +1,11 @@
 <?php
 
 use Betod\Livotec\Controllers\AppointmentController;
+use Betod\Livotec\Controllers\Category\ImportCSV;
 use Betod\Livotec\Controllers\GhnController;
 use Betod\Livotec\Controllers\OrderController;
+use Betod\Livotec\Controllers\Revenue\RevenueChart;
+use Betod\Livotec\Controllers\Schedules\ImportCsvSchedules;
 use Betod\Livotec\Controllers\VnPayController;
 use Betod\Livotec\Controllers\ZaloPayController;
 use Betod\Livotec\Models\Product;
@@ -157,12 +160,12 @@ Route::group(['prefix' => 'apiPaypal'], function () {
 
 Route::group(['prefix' => 'apiImport'], function () {
     Route::post('import', [\Betod\Livotec\Controllers\Product\ImportCSV::class, 'importCsv']);
-    Route::post('importCsvSchedules', [\Betod\Livotec\Controllers\Schedules\ImportCsvSchedules::class, 'importCsvSchedules']);
-    Route::post('import-category', [\Betod\Livotec\Controllers\Category\ImportCSV::class, 'importCsv']);
+    Route::post('importCsvSchedules', [ImportCsvSchedules::class, 'importCsvSchedules']);
+    Route::post('import-category', [ImportCSV::class, 'importCsv']);
 });
 
 Route::group(['prefix' => 'apiData'], function () {
-    Route::get('data', [\Betod\Livotec\Controllers\Revenue\RevenueChart::class, 'chart']);
+    Route::get('data', [RevenueChart::class, 'chart']);
 });
 
 Route::group(['prefix' => 'apiGHN'], function () {

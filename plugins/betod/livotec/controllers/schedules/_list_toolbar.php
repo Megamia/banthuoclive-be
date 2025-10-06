@@ -22,13 +22,14 @@
     </form>
 
     <script>
+        const APP_URL = "<?php echo env('APP_URL'); ?>";
         document.getElementById('importCsvInput').addEventListener('change', function (event) {
             event.preventDefault();
             let formData = new FormData();
             formData.append('csv_file', this.files[0]);
             let csrfToken = document.querySelector('input[name="_token"]').value;
 
-            fetch('http://127.0.0.1:8000/apiImport/importCsvSchedules', {
+            fetch(`${APP_URL}/apiImport/importCsvSchedules`, {
                 method: 'POST',
                 body: formData,
                 headers: {

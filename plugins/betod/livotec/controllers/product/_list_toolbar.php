@@ -3,8 +3,7 @@
         <?= e(trans('backend::lang.form.create')) ?>
     </a>
 
-    <form id="importCsvForm" enctype="multipart/form-data"
-        style="display: flex; margin-left: 10px;margin-right: 20px;">
+    <form id="importCsvForm" enctype="multipart/form-data" style="display: flex; margin-left: 10px;margin-right: 20px;">
         <?= csrf_field() ?>
         <input type="file" name="csv_file" accept=".csv" style="display: none;" id="importCsvInput">
         <button type="button" class="btn btn-primary oc-icon-upload"
@@ -31,6 +30,7 @@
 
 
     <script>
+        const APP_URL = "<?php echo env('APP_URL'); ?>";
         document.getElementById('importCsvInput').addEventListener('change', function (event) {
             event.preventDefault();
             let formData = new FormData();
@@ -39,7 +39,7 @@
             let csrfToken = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
             csrfToken = csrfToken ? csrfToken[1] : '';
 
-            fetch('http://127.0.0.1:8000/apiImport/import', {
+            fetch(`${APP_URL}/apiImport/import`, {
                 method: 'POST',
                 body: formData,
                 headers: {
