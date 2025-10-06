@@ -2,7 +2,7 @@
 
 namespace Betod\Livotec\Controllers\Schedules;
 
-use Backend\Classes\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Doctor;

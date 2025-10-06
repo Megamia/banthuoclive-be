@@ -1,7 +1,7 @@
 <?php
 namespace Betod\Livotec\Controllers\Revenue;
 
-use Backend\Classes\Controller;
+use Illuminate\Routing\Controller;
 use Betod\Livotec\Models\Orders;
 use Illuminate\Support\Facades\DB;
 

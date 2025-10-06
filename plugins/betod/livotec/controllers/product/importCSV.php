@@ -2,7 +2,7 @@
 
 namespace Betod\Livotec\Controllers\Product;
 
-use Backend\Classes\Controller;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Betod\Livotec\Models\Product;
 use League\Csv\Reader;
