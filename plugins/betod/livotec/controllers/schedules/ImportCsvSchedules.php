@@ -64,21 +64,31 @@ class ImportCsvSchedules extends Controller
                 if (!$dayOfWeek || $dayOfWeek < 1 || $dayOfWeek > 7)
                     continue;
 
-                $schedule = Schedules::where('doctor_id', $doctor->id)
-                    ->where('day_of_week', $dayOfWeek)
-                    ->where('start_time', $row['start_time'])
-                    ->where('end_time', $row['end_time'])
-                    ->first();
+                $startTime = isset($row['start_time']) ? date('H:i', strtotime($row['start_time'])) : null;
+                $endTime = isset($row['end_time']) ? date('H:i', strtotime($row['end_time'])) : null;
 
-                if ($schedule) {
+                if (!$startTime || !$endTime)
                     continue;
-                }
+
+                $existingSchedule = Schedules::where('doctor_id', $doctor->id)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->where(function ($q) use ($startTime, $endTime) {
+                        $q->whereBetween('start_time', [$startTime, $endTime])
+                            ->orWhereBetween('end_time', [$startTime, $endTime])
+                            ->orWhere(function ($q2) use ($startTime, $endTime) {
+                                $q2->where('start_time', '<=', $startTime)
+                                    ->where('end_time', '>=', $endTime);
+                            });
+                    })->first();
+
+                if ($existingSchedule)
+                    continue;
 
                 Schedules::create([
                     'doctor_id' => $doctor->id,
                     'day_of_week' => $dayOfWeek,
-                    'start_time' => $row['start_time'] ?? null,
-                    'end_time' => $row['end_time'] ?? null,
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
                 ]);
                 $importedCount++;
             }
