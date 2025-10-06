@@ -4,7 +4,7 @@ namespace Betod\Livotec\Controllers;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
-class VnpayController extends Controller
+class VnPayController extends Controller
 {
     public function createOrder(Request $request)
     {
