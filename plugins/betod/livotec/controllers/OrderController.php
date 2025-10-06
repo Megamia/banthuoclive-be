@@ -59,9 +59,8 @@ class OrderController extends Controller
                 'items.*.price' => 'required|numeric|min:0',
                 'paypal_order_id' => 'nullable|string|max:500',
                 'zalopay_app_trans_id' => 'nullable|string|max:500',
-                'vnpay_order_id ' => 'nullable|string|max:500',
+                'vnpay_order_id' => 'nullable|string|max:500',
             ]);
-
 
             $totalPrice = array_reduce($validatedData['items'], function ($sum, $item) {
                 return $sum + $item['price'] * $item['quantity'];
@@ -69,7 +68,6 @@ class OrderController extends Controller
 
             $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(6));
             $propertyData = Arr::except($validatedData, ['items', 'differentaddresschecked', 'terms', 'user_id']);
-
             if ($request->has('paypal_order_id')) {
                 $propertyData['paymenttype'] = 1;
                 $propertyData['payment_gateway'] = 'paypal';
@@ -78,15 +76,14 @@ class OrderController extends Controller
                 $propertyData['paymenttype'] = 1;
                 $propertyData['payment_gateway'] = 'zalopay';
                 $propertyData['payment_order_id'] = $request->input('zalopay_app_trans_id');
-            } elseif ($request->has('vnpay_order_id ')) {
+            } elseif ($request->has('vnpay_order_id')) {
                 $propertyData['paymenttype'] = 1;
                 $propertyData['payment_gateway'] = 'vnpay';
-                $propertyData['payment_order_id'] = $request->input('zalopay_app_trans_id');
+                $propertyData['payment_order_id'] = $request->input('vnpay_order_id');
             } else {
                 $propertyData['paymenttype'] = 2;
                 $propertyData['payment_gateway'] = 'cod';
             }
-
 
             DB::beginTransaction();
 
