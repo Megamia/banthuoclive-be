@@ -123,8 +123,4 @@ class VnPayController extends Controller
             return response()->json(['RspCode' => '97', 'Message' => 'Invalid Signature']);
         }
     }
-    public function testapi(Request $request)
-    {
-        return response()->json(['data' => "ok"]);
-    }
 }

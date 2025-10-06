@@ -297,8 +297,4 @@ class AppointmentController extends Controller
             ]);
         }
     }
-    public function testapi(Request $request)
-    {
-        return response()->json(['data' => "ok"]);
-    }
 }

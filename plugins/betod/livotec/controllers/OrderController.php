@@ -7,7 +7,7 @@ use Betod\Livotec\Models\OrderDetail;
 use Betod\Livotec\Models\Product;
 use Betod\Livotec\Models\Orders;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Backend\Classes\Controller;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;

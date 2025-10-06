@@ -1,7 +1,7 @@
 <?php
 namespace Betod\Livotec\Controllers;
 
-use Illuminate\Routing\Controller;
+use Backend\Classes\Controller;
 use Illuminate\Support\Facades\Http;
 
 class GhnController extends Controller

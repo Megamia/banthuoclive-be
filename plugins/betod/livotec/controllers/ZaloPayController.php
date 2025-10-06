@@ -1,7 +1,7 @@
 <?php
 namespace Betod\Livotec\Controllers;
 
-use Illuminate\Routing\Controller;
+use Backend\Classes\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;

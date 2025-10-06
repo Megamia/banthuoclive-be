@@ -148,8 +148,6 @@ Route::group(['prefix' => 'apiAppointment'], function () {
     Route::get("doctors/{doctorId}/schedules", [AppointmentController::class, 'getSchedulesByDoctorId']);
     Route::post("createAppointment", [AppointmentController::class, 'createAppointment']);
     Route::get("getDataAppointmentByUserid/{userId}", [AppointmentController::class, 'getDataAppointmentByUserid']);
-    Route::get("testapi", [AppointmentController::class, 'testapi']);
-
 });
 
 Route::group(['prefix' => 'apiPaypal'], function () {
@@ -183,6 +181,4 @@ Route::group(['prefix' => 'api/vnpay'], function () {
     Route::post('/create-order', [VnPayController::class, 'createOrder']);
     Route::get('/return', [VnPayController::class, 'return']);
     // Route::post('/query-order', [VnPayController::class, 'queryOrder']);
-    Route::get("testapi", [VnPayController::class, 'testapi']);
-
 });
