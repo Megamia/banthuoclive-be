@@ -5,9 +5,9 @@
     <form id="importCsvForm" enctype="multipart/form-data"
         style="display: inline-block; margin-left: 10px;margin-right: 20px;">
         <?= csrf_field() ?>
-        <input type="file" name="csv_file" accept=".csv" style="display: none;" id="importCsvInput">
+        <input type="file" name="csv_file" accept=".csv" style="display: none;" id="ImportCsvInput">
         <button type="button" class="btn btn-primary oc-icon-upload"
-            onclick="document.getElementById('importCsvInput').click();">
+            onclick="document.getElementById('ImportCsvInput').click();">
             Import CSV
         </button>
     </form>
