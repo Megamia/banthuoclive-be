@@ -62,10 +62,11 @@ class VnpayController extends Controller
             \Log::error('VNPAY createOrder error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+           return response()->json([
+            'code' => '99',
+            'message' => 'Internal server error',
+            'error' => $e->getMessage(),
+        ], 500);
         }
     }
 
