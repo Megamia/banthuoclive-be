@@ -183,4 +183,6 @@ Route::group(['prefix' => 'api/vnpay'], function () {
     Route::post('/create-order', [VnPayController::class, 'createOrder']);
     Route::get('/return', [VnPayController::class, 'return']);
     // Route::post('/query-order', [VnPayController::class, 'queryOrder']);
+    Route::get("testapi", [VnPayController::class, 'testapi']);
+
 });
