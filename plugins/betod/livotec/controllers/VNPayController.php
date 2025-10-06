@@ -13,10 +13,10 @@ class VnpayController extends Controller
         $vnp_Url = trim(env('VNPAY_URL'));
         $vnp_Returnurl = trim(env('VNPAY_RETURN_URL'));
 
-        $vnp_TxnRef = (string) time();
+        $vnp_TxnRef = (string) time(); 
         $vnp_OrderInfo = $request->input('orderInfo', "Thanh toán đơn hàng test");
         $vnp_Amount = intval($request->input('amount', 10000)) * 100;
-        $vnp_Locale = "vn";
+        $vnp_Locale = $request->input('locale', 'vn');
         $vnp_IpAddr = $request->ip();
         $vnp_OrderType = "billpayment";
 
@@ -32,9 +32,11 @@ class VnpayController extends Controller
             "vnp_OrderInfo" => $vnp_OrderInfo,
             "vnp_OrderType" => $vnp_OrderType,
             "vnp_ReturnUrl" => $vnp_Returnurl,
+            "vnp_TxnRef" => $vnp_TxnRef,
         ];
 
         ksort($inputData);
+
         $hashDataArr = [];
         foreach ($inputData as $key => $value) {
             $hashDataArr[] = urlencode($key) . "=" . urlencode($value);
@@ -44,7 +46,7 @@ class VnpayController extends Controller
         $vnp_SecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
         $query = http_build_query($inputData);
-        $redirectUrl = $vnp_Url . "?" . $query . "&vnp_SecureHash=" . $vnp_SecureHash . "&vnp_SecureHashType=SHA512";
+        $redirectUrl = $vnp_Url . "?" . $query . "&vnp_SecureHash=" . $vnp_SecureHash;
 
         return response()->json([
             'code' => '00',
@@ -64,17 +66,14 @@ class VnpayController extends Controller
         $vnp_HashSecret = trim(env('VNPAY_HASH_SECRET'));
 
         unset($inputData['vnp_SecureHashType'], $inputData['vnp_SecureHash']);
-
         ksort($inputData);
+
         $hashDataArr = [];
         foreach ($inputData as $key => $value) {
-            if (is_string($value))
-                $value = mb_convert_encoding($value, 'UTF-8');
             $hashDataArr[] = $key . "=" . $value;
         }
         $hashData = implode('&', $hashDataArr);
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
 
         if ($secureHash === $vnp_SecureHash) {
             if (($inputData['vnp_ResponseCode'] ?? '') === '00') {
@@ -94,17 +93,14 @@ class VnpayController extends Controller
         $vnp_HashSecret = trim(env('VNPAY_HASH_SECRET'));
 
         unset($inputData['vnp_SecureHashType'], $inputData['vnp_SecureHash']);
-
         ksort($inputData);
+
         $hashDataArr = [];
         foreach ($inputData as $key => $value) {
-            if (is_string($value))
-                $value = mb_convert_encoding($value, 'UTF-8');
             $hashDataArr[] = $key . "=" . $value;
         }
         $hashData = implode('&', $hashDataArr);
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-
 
         if ($secureHash === $vnp_SecureHash) {
             if (($inputData['vnp_ResponseCode'] ?? '') === '00') {
