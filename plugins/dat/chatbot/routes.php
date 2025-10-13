@@ -53,18 +53,22 @@ Route::group(['prefix' => 'apiChatBot'], function () {
     });
 
     Route::post('/chat', function (Request $request) {
-        $message = strtolower(trim($request->input('message', '')));
-        if (empty($message)) {
+        $message = trim($request->input('message', ''));
+
+        if (!$message) {
             return response()->json(['reply' => 'Vui lòng nhập tin nhắn hợp lệ.'], 400);
         }
 
-        $chatResponse = ChatBot::where('question', $message)->inRandomOrder()->first();
+        $chatResponse = ChatBot::where('question', strtolower($message))->inRandomOrder()->first();
         if ($chatResponse) {
             return response()->json(['reply' => $chatResponse->answer]);
         }
 
-        if (str_starts_with($message, 'tìm kiếm')) {
-            return handleProductFind($message);
+        $productSearchResponse = handleProductFind($message);
+        $dataProducts = $productSearchResponse->getData(true)['products'] ?? [];
+
+        if (!empty($dataProducts)) {
+            return $productSearchResponse;
         }
 
         return callGeminiAPI($message);

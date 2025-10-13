@@ -8,26 +8,34 @@ use Illuminate\Support\Facades\Log;
 
 function handleProductFind($message)
 {
-    $keyword = trim(str_replace('tìm kiếm', '', $message));
-    if (empty($keyword)) {
+    $keyword = trim($message);
+
+    if ($keyword === '') {
         return response()->json([
             'reply' => 'Vui lòng nhập từ khóa sản phẩm cần tìm kiếm.',
             'products' => []
         ]);
     }
 
-    $products = Cache::remember("find_product_$keyword", 600, function () use ($keyword) {
-        $category = Category::where('name', 'LIKE', "%$keyword%")->first();
-        return $category
-            ? Product::where('category_id', $category->id)->get()
-            : Product::where('name', 'LIKE', "%$keyword%")->get();
+    $cacheKey = 'find_product_' . strtolower(preg_replace('/\s+/', '_', $keyword));
+
+    $products = Cache::remember($cacheKey, 600, function () use ($keyword) {
+        $query = Product::query()
+            ->where('name', 'LIKE', "%{$keyword}%")
+            ->orWhere('slug', 'LIKE', "%{$keyword}%")
+            ->orWhere('description', 'LIKE', "%{$keyword}%");
+
+        $category = Category::where('name', 'LIKE', "%{$keyword}%")->first();
+        if ($category) {
+            $query->orWhere('category_id', $category->id);
+        }
+
+        return $query->orderBy('price')->get();
     });
 
     if ($products->isNotEmpty()) {
-        $products = $products->sortBy('price');
-
         return response()->json([
-            'reply' => 'Danh sách sản phẩm phù hợp:',
+            'reply' => "Tìm thấy {$products->count()} sản phẩm phù hợp với từ khóa “{$keyword}”:",
             'products' => $products->map(function ($product, $index) {
                 return [
                     'index' => $index + 1,
@@ -35,14 +43,15 @@ function handleProductFind($message)
                     'name' => $product->name,
                     'price' => $product->price ?? 0,
                     'stock' => $product->stock,
+                    'slug' => $product->slug,
                 ];
-            })->values()
+            })->values(),
         ]);
     }
 
     return response()->json([
-        'reply' => 'Xin lỗi, không tìm thấy sản phẩm phù hợp.',
-        'products' => []
+        'reply' => "Xin lỗi, không tìm thấy sản phẩm nào phù hợp với từ khóa “{$keyword}”.",
+        'products' => [],
     ]);
 }
 
@@ -61,11 +70,64 @@ function callGeminiAPI($message)
         ]);
 
         $responseData = json_decode($res->getBody(), true);
-        $reply = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? 'Xin lỗi, tôi không có câu trả lời.';
+        $reply = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? 'Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này.';
 
-        return response()->json(['reply' => $reply]);
+        $keywordMap = [
+            'Cơ xương khớp' => ['xương', 'khớp', 'đau khớp', 'thoái hóa', 'mỏi khớp', 'gout', 'viêm khớp'],
+            'Vitamin & Khoáng chất' => ['vitamin', 'khoáng', 'thiếu chất', 'mệt mỏi', 'bổ sung', 'tăng đề kháng'],
+            'Dinh dưỡng' => ['ăn uống', 'dinh dưỡng', 'tăng cân', 'giảm cân', 'sữa', 'protein'],
+            'Dược mỹ phẩm' => ['kem dưỡng', 'mỹ phẩm', 'serum', 'chống nắng', 'trị mụn'],
+            'Chăm sóc da mặt' => ['da', 'mặt', 'dưỡng da', 'mụn', 'lão hóa'],
+            'Chăm sóc cá nhân' => ['chăm sóc', 'cá nhân', 'vệ sinh', 'khử mùi'],
+            'Bao cao su' => ['bao cao su', 'an toàn', 'quan hệ'],
+            'Thiết bị y tế' => ['đo huyết áp', 'nhiệt kế', 'y tế', 'đo đường'],
+            'Cải thiện tăng cường chức năng' => ['tăng cường', 'sức khỏe', 'bổ thận', 'sinh lý', 'tăng lực']
+        ];
+
+        $matchedCategory = null;
+
+        foreach ($keywordMap as $catName => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (mb_stripos($message, $keyword) !== false) {
+                    $matchedCategory = $catName;
+                    break 2;
+                }
+            }
+        }
+
+        $productSuggestions = [];
+        if ($matchedCategory) {
+            $category = Category::where('name', 'LIKE', "%{$matchedCategory}%")->first();
+            if ($category) {
+                $products = Product::where('category_id', $category->id)
+                    ->orderBy('price')
+                    ->take(3)
+                    ->get();
+
+                foreach ($products as $p) {
+                    $productSuggestions[] = [
+                        'index' => null,
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'price' => $p->price,
+                        'stock' => $p->stock,
+                        'slug' => $p->slug
+                    ];
+                }
+
+                if ($products->isNotEmpty()) {
+                    $reply .= "\n\n💊 Một số sản phẩm bạn có thể quan tâm thuộc nhóm {$matchedCategory}:";
+                }
+            }
+        }
+
+        return response()->json([
+            'reply' => $reply,
+            'products' => $productSuggestions
+        ]);
+
     } catch (\Exception $e) {
-        Log::error('Lỗi khi gọi API Gemini: ' . $e->getMessage());
+        \Log::error('Lỗi khi gọi Gemini hoặc gợi ý sản phẩm: ' . $e->getMessage());
         return response()->json(['reply' => 'AI đang gặp sự cố. Vui lòng thử lại sau.'], 500);
     }
 }
