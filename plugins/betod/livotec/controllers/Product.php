@@ -26,13 +26,16 @@ class Product extends Controller
         if ($status = input('filter_status')) {
             switch ($status) {
                 case 'out_of_stock':
-                    $query->where('stock', 0);
+                    $query->where('stock', 0)
+                        ->orderBy('stock', 'desc');
                     break;
                 case 'best_seller':
-                    $query->where('sold_out', '>', 100); 
+                    $query->where('sold_out', '>', 100)
+                        ->orderBy('sold_out', 'desc');
                     break;
                 case 'in_stock':
-                    $query->where('stock', '>', 0);
+                    $query->where('stock', '>', 0)
+                        ->orderBy('stock', 'desc');
                     break;
             }
         }

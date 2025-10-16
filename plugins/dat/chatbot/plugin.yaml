@@ -4,8 +4,3 @@ plugin:
     author: dat
     icon: oc-icon-android
     homepage: ''
-navigation:
-    chat-bot:
-        label: ChatBot
-        url: dat/chatbot/chatbotcontroller
-        icon: icon-android
