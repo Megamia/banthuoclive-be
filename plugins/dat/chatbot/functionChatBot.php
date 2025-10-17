@@ -74,7 +74,7 @@ function callGeminiAPI($message)
 
         $keywordMap = [
             'Cơ xương khớp' => ['xương', 'khớp', 'đau khớp', 'thoái hóa', 'mỏi khớp', 'gout', 'viêm khớp'],
-            'Vitamin & Khoáng chất' => ['vitamin', 'khoáng', 'thiếu chất', 'mệt mỏi', 'bổ sung', 'tăng đề kháng'],
+            'Vitamin & Khoáng chất' => ['vitamin', 'khoáng', 'thiếu chất', 'mệt', 'bổ sung', 'tăng đề kháng'],
             'Dinh dưỡng' => ['ăn uống', 'dinh dưỡng', 'tăng cân', 'giảm cân', 'sữa', 'protein'],
             'Dược mỹ phẩm' => ['kem dưỡng', 'mỹ phẩm', 'serum', 'chống nắng', 'trị mụn'],
             'Chăm sóc da mặt' => ['da mặt', 'dưỡng da', 'mụn', 'lão hóa'],
@@ -143,7 +143,7 @@ function callGeminiAPI($message)
         }
 
         if (!$categoryFound) {
-            $keyword = explode(' ', trim($messageLower))[0]; 
+            $keyword = explode(' ', trim($messageLower))[0];
             $products = Product::where('name', 'LIKE', "%{$keyword}%")
                 ->orderBy('price')
                 ->take(3)
