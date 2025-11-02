@@ -1,8 +1,6 @@
 FROM php:8.2-fpm
 
-# Inject ENV từ Railway
-ARG OCTOBER_AUTH_JSON
-ENV COMPOSER_AUTH=$OCTOBER_AUTH_JSON
+ENV COMPOSER_AUTH=""
 
 # Install system packages
 RUN apt-get update && apt-get install -y \
@@ -29,17 +27,16 @@ WORKDIR /var/www
 # Copy source code
 COPY . .
 
-# Tạo auth.json rồi cài Composer
+# Cài package
 RUN mkdir -p /root/.composer \
     && echo "$COMPOSER_AUTH" > /root/.composer/auth.json \
+    && cat /root/.composer/auth.json \
     && composer install --ignore-platform-reqs --no-interaction --prefer-dist \
     && rm /root/.composer/auth.json
 
 RUN mkdir -p /var/www/public \
     && mkdir -p /var/www/storage/app/public
 
-
 EXPOSE 8000
 
-# Run Laravel dev server
 CMD ["sh", "-c", "php artisan livotec:upload-images && php -S 0.0.0.0:8000 -t . vendor/october/rain/src/Foundation/resources/server.php"]
