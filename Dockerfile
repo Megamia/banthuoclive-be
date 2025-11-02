@@ -1,9 +1,19 @@
 FROM php:8.2-fpm
 
-# Biến môi trường (Render sẽ override giá trị này)
-ENV COMPOSER_AUTH=""
+# Nhận biến môi trường (Render hoặc CI sẽ set giá trị này)
+ARG COMPOSER_AUTH_B64
+ENV COMPOSER_AUTH_B64=$COMPOSER_AUTH_B64
 
-# Install system packages
+# Log giá trị base64 để debug
+RUN echo "=== DEBUG: GIÁ TRỊ COMPOSER_AUTH_B64 (base64) ===" && \
+    echo "$COMPOSER_AUTH_B64" && \
+    echo "=== DEBUG: GIẢI MÃ BASE64 THÀNH COMPOSER_AUTH ===" && \
+    export COMPOSER_AUTH=$(echo "$COMPOSER_AUTH_B64" | base64 -d 2>/dev/null || echo "{}") && \
+    echo "$COMPOSER_AUTH" > /tmp/auth.json && \
+    echo "=== DEBUG: COMPOSER_AUTH (sau khi decode) ===" && \
+    cat /tmp/auth.json
+
+# Cài hệ thống
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -19,33 +29,29 @@ RUN apt-get update && apt-get install -y \
     cron \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Install Composer
+# Cài Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory
+# Thư mục làm việc
 WORKDIR /var/www
 
-# Copy source code
+# Copy code
 COPY . .
 
 # Debug và cài Composer packages
 RUN set -eux; \
-    echo "=== DEBUG: COMPOSER_AUTH VALUE START ==="; \
+    echo "=== DEBUG: COMPOSER_AUTH TRONG BƯỚC CÀI PACKAGE ==="; \
     echo "$COMPOSER_AUTH"; \
-    echo "=== DEBUG: COMPOSER_AUTH VALUE END ==="; \
-    \
     mkdir -p /root/.composer; \
     echo "$COMPOSER_AUTH" > /root/.composer/auth.json; \
-    echo "=== DEBUG: SAVED /root/.composer/auth.json ==="; \
+    echo "=== DEBUG: NỘI DUNG /root/.composer/auth.json ==="; \
     cat /root/.composer/auth.json; \
     \
-    # Kiểm tra JSON hợp lệ trước khi cài
-    php -r "json_decode(file_get_contents('/root/.composer/auth.json')); if (json_last_error() !== JSON_ERROR_NONE) { fwrite(STDERR, '❌ COMPOSER_AUTH JSON không hợp lệ: '.json_last_error_msg().PHP_EOL); exit(1); }"; \
+    php -r "json_decode(file_get_contents('/root/.composer/auth.json')); if (json_last_error() !== JSON_ERROR_NONE) { fwrite(STDERR, '❌ JSON không hợp lệ: '.json_last_error_msg().PHP_EOL); exit(1); }"; \
     \
-    echo "=== DEBUG: BẮT ĐẦU CÀI COMPOSER PACKAGES ==="; \
+    echo '=== DEBUG: BẮT ĐẦU COMPOSER INSTALL ==='; \
     composer install --ignore-platform-reqs --no-interaction --prefer-dist || { echo '❌ Composer install failed'; cat /root/.composer/auth.json; exit 1; }; \
-    echo "=== DEBUG: CÀI COMPOSER THÀNH CÔNG ==="; \
-    \
+    echo '=== DEBUG: COMPOSER INSTALL THÀNH CÔNG ==='; \
     rm /root/.composer/auth.json
 
 # Chuẩn bị thư mục public & storage
