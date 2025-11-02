@@ -11,6 +11,7 @@ COPY . .
 EXPOSE 8000
 
 CMD ["sh", "-c", "\
+mkdir -p /root/.composer && \
 echo \"$COMPOSER_AUTH\" > /root/.composer/auth.json && \
 composer install --ignore-platform-reqs --no-interaction --prefer-dist && \
 php artisan livotec:upload-images && \
