@@ -55,22 +55,55 @@ function handleProductFind($message)
     ]);
 }
 
-function callGeminiAPI($message)
+function callOpenAPI($message)
 {
-    $gemini_api_key = env('GEMINI_API_KEY');
-    if (!$gemini_api_key) {
-        return response()->json(['reply' => 'Chưa cấu hình API AI.'], 500);
+    $openaiKey = env('OPENAI_API_KEY');
+    if (!$openaiKey) {
+        return response()->json(['reply' => 'Chưa cấu hình OpenAI API.'], 500);
     }
 
     try {
         $client = new Client();
-        $res = $client->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$gemini_api_key", [
-            'headers' => ['Content-Type' => 'application/json'],
-            'json' => ['contents' => [['parts' => [['text' => $message]]]]]
-        ]);
 
-        $responseData = json_decode($res->getBody(), true);
-        $reply = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? 'Xin lỗi, tôi chưa có câu trả lời cho câu hỏi này.';
+        $prompt = $message;
+
+        $res = $client->post(
+            'https://openrouter.ai/api/v1/chat/completions',
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                    'Content-Type' => 'application/json',
+
+                    'HTTP-Referer' => 'http://localhost',
+                    'X-Title' => 'Laravel Chatbot',
+                ],
+                'json' => [
+                    'model' => 'mistralai/mistral-7b-instruct:free',
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'Bạn là chatbot tư vấn sản phẩm y tế.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => $message
+                        ],
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens' => 200,
+                ]
+            ]
+        );
+
+
+        $data = json_decode($res->getBody(), true);
+        $reply = $data['choices'][0]['message']['content'] ?? '';
+
+        $reply = trim($reply);
+        $reply = preg_replace('/^<s>|<\/s>$|^###/i', '', $reply);
+        $reply = trim($reply);
+
+
 
         $keywordMap = [
             'Cơ xương khớp' => ['xương', 'khớp', 'đau khớp', 'thoái hóa', 'mỏi khớp', 'gout', 'viêm khớp'],
@@ -78,18 +111,13 @@ function callGeminiAPI($message)
             'Dinh dưỡng' => ['ăn uống', 'dinh dưỡng', 'tăng cân', 'giảm cân', 'sữa', 'protein'],
             'Dược mỹ phẩm' => ['kem dưỡng', 'mỹ phẩm', 'serum', 'chống nắng', 'trị mụn'],
             'Chăm sóc da mặt' => ['da mặt', 'dưỡng da', 'mụn', 'lão hóa'],
-            'Chăm sóc cá nhân' => ['vệ sinh', 'khử mùi', 'tắm gội', 'chăm sóc cá nhân'],
-            'Bao cao su' => ['bao cao su', 'an toàn tình dục', 'quan hệ'],
-            'Thiết bị y tế' => ['đo huyết áp', 'nhiệt kế', 'máy đo đường', 'thiết bị y tế'],
+            'Chăm sóc cá nhân' => ['vệ sinh', 'khử mùi', 'tắm gội'],
+            'Bao cao su' => ['bao cao su', 'an toàn tình dục'],
+            'Thiết bị y tế' => ['đo huyết áp', 'nhiệt kế', 'máy đo đường'],
             'Cải thiện tăng cường chức năng' => [
-                'tăng cường sức khỏe',
                 'bổ thận',
                 'sinh lý',
-                'tăng lực',
                 'tuần hoàn não',
-                'hoạt huyết',
-                'chóng mặt',
-                'hoa mắt',
                 'mất ngủ',
                 'stress'
             ]
@@ -101,11 +129,11 @@ function callGeminiAPI($message)
         $bestLength = 0;
 
         foreach ($keywordMap as $catName => $keywords) {
-            foreach ($keywords as $keyword) {
-                $pos = mb_stripos($messageLower, $keyword);
+            foreach ($keywords as $kw) {
+                $pos = mb_stripos($messageLower, $kw);
                 if ($pos !== false) {
-                    $len = mb_strlen($keyword);
-                    if ($len > $bestLength || ($len == $bestLength && $pos < $bestPos)) {
+                    $len = mb_strlen($kw);
+                    if ($len > $bestLength || ($len === $bestLength && $pos < $bestPos)) {
                         $bestMatch = $catName;
                         $bestPos = $pos;
                         $bestLength = $len;
@@ -126,39 +154,17 @@ function callGeminiAPI($message)
                     ->take(3)
                     ->get();
 
-                foreach ($products as $p) {
-                    $productSuggestions[] = [
-                        'id' => $p->id,
-                        'name' => $p->name,
-                        'price' => $p->price,
-                        'stock' => $p->stock,
-                        'slug' => $p->slug
-                    ];
-                }
-
                 if ($products->isNotEmpty()) {
-                    $reply .= "\n\n💊 Một số sản phẩm bạn có thể quan tâm thuộc nhóm {$bestMatch}:";
-                }
-            }
-        }
-
-        if (!$categoryFound) {
-            $keyword = explode(' ', trim($messageLower))[0];
-            $products = Product::where('name', 'LIKE', "%{$keyword}%")
-                ->orderBy('price')
-                ->take(3)
-                ->get();
-
-            if ($products->isNotEmpty()) {
-                $reply .= "\n\n💊 Tôi đã tìm thấy một số sản phẩm có liên quan đến từ khóa bạn nói:";
-                foreach ($products as $p) {
-                    $productSuggestions[] = [
-                        'id' => $p->id,
-                        'name' => $p->name,
-                        'price' => $p->price,
-                        'stock' => $p->stock,
-                        'slug' => $p->slug
-                    ];
+                    $reply .= "\n\n💊 Một số sản phẩm bạn có thể quan tâm ({$bestMatch}):";
+                    foreach ($products as $p) {
+                        $productSuggestions[] = [
+                            'id' => $p->id,
+                            'name' => $p->name,
+                            'price' => $p->price,
+                            'stock' => $p->stock,
+                            'slug' => $p->slug
+                        ];
+                    }
                 }
             }
         }
@@ -169,7 +175,7 @@ function callGeminiAPI($message)
         ]);
 
     } catch (\Exception $e) {
-        \Log::error('Lỗi khi gọi Gemini hoặc gợi ý sản phẩm: ' . $e->getMessage());
+        Log::error('Lỗi khi gọi OpenAI: ' . $e->getMessage());
         return response()->json(['reply' => 'AI đang gặp sự cố. Vui lòng thử lại sau.'], 500);
     }
 }

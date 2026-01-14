@@ -71,7 +71,7 @@ Route::group(['prefix' => 'apiChatBot'], function () {
             return $productSearchResponse;
         }
 
-        return callGeminiAPI($message);
+        return callOpenAPI($message);
     });
 
     Route::get('/allChat', function () {
