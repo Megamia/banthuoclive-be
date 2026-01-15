@@ -17,13 +17,15 @@ function handleProductFind($message)
         ]);
     }
 
-    $cacheKey = 'find_product_' . strtolower(preg_replace('/\s+/', '_', $keyword));
+    $cacheKey = 'find_product_' . md5(mb_strtolower($keyword));
 
     $products = Cache::remember($cacheKey, 600, function () use ($keyword) {
         $query = Product::query()
-            ->where('name', 'LIKE', "%{$keyword}%")
-            ->orWhere('slug', 'LIKE', "%{$keyword}%")
-            ->orWhere('description', 'LIKE', "%{$keyword}%");
+            ->where(function ($q) use ($keyword) {
+                $q->where('name', 'LIKE', "%{$keyword}%")
+                    ->orWhere('slug', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%");
+            });
 
         $category = Category::where('name', 'LIKE', "%{$keyword}%")->first();
         if ($category) {
@@ -57,8 +59,8 @@ function handleProductFind($message)
 
 function callOpenAPI($message)
 {
-    $openaiKey = env('OPENAI_API_KEY');
-    if (!$openaiKey) {
+    $openRouterKey = env('OPENROUTER_API_KEY');
+    if (!$openRouterKey) {
         return response()->json(['reply' => 'Chưa cấu hình OpenAI API.'], 500);
     }
 
@@ -71,7 +73,7 @@ function callOpenAPI($message)
             'https://openrouter.ai/api/v1/chat/completions',
             [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                    'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY'),
                     'Content-Type' => 'application/json',
 
                     'HTTP-Referer' => 'http://localhost',

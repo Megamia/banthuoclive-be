@@ -9,3 +9,7 @@ Route::group(['prefix' => 'apiUser'], function () {
     Route::post('logout', [\Dat\User\Controllers\UserController::class, 'logout']);
     Route::get('test', [\Dat\User\Controllers\UserController::class, 'test']);
 });
+
+Route::group(['prefix' => 'apiClarifai'], function () {
+    Route::post('getDataClarifai', [\Dat\User\Controllers\UserController::class, 'getDataClarifai']);
+});

@@ -6,6 +6,8 @@ use BackendMenu;
 use Backend\Classes\Controller;
 use Dat\User\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -226,6 +228,49 @@ class UserController extends Controller
             'message' => "test ok",
             'data' => $data
         ]);
+    }
+    public function getDataClarifai(Request $request)
+    {
+        $request->validate([
+            'modelId' => 'required|string',
+            'imageBase64' => 'required|string',
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Key ' . config('services.clarifai.api_key'),
+                'Content-Type' => 'application/json',
+            ])->post(
+                    "https://api.clarifai.com/v2/models/{$request->modelId}/outputs",
+                    [
+                        'inputs' => [
+                            [
+                                'data' => [
+                                    'image' => [
+                                        'base64' => $request->imageBase64,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]
+                );
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'error' => 'Clarifai API error',
+                    'detail' => $response->body(),
+                ], 500);
+            }
+
+            return response()->json($response->json());
+
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 }
