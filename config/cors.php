@@ -4,7 +4,7 @@ return [
     'paths' => ['api/*', 'apiUser/*', 'sanctum/csrf-cookie'],
 
     'allowed_origins' => [
-        'https://banthuoclive-fe.vercel.app',
+        'https://www.luudanhdat.id.vn',
     ],
 
     'allowed_origins_patterns' => [],
