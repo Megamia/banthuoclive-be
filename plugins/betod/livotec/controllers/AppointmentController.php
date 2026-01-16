@@ -10,6 +10,8 @@ use Betod\Livotec\Models\Schedules;
 use Betod\Livotec\Models\Specialties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
@@ -73,6 +75,43 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function sendAppointmentMailAPI($to, $data)
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SENDGRID_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendgrid.com/v3/mail/send', [
+                        'personalizations' => [
+                            [
+                                'to' => [
+                                    ['email' => $to]
+                                ],
+                                'subject' => 'Xác nhận lịch hẹn khám',
+                            ]
+                        ],
+                        'from' => [
+                            'email' => env('MAIL_FROM_ADDRESS'),
+                            'name' => env('MAIL_FROM_NAME'),
+                        ],
+                        'content' => [
+                            [
+                                'type' => 'text/html',
+                                'value' => view(
+                                    'betod.livotec::mail.appointment_confirm',
+                                    $data
+                                )->render(),
+                            ]
+                        ],
+                    ]);
+
+        } catch (\Throwable $e) {
+            Log::error('SendGrid: Exception khi gửi mail', [
+                'to' => $to,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 
     public function createAppointment(Request $request)
     {
@@ -132,20 +171,15 @@ class AppointmentController extends Controller
             $clinic = \Betod\Livotec\Models\Clinics::where('doctor_id', $doctor->id)->first();
 
             if ($user?->email) {
-
-                Mail::send('betod.livotec::mail.appointment_confirm', [
+                $this->sendAppointmentMailAPI($user->email, [
                     'user_name' => trim(($user?->first_name ?? '') . ' ' . ($user?->last_name ?? '')),
                     'doctor_name' => $doctor?->name ?? 'Bác sĩ',
                     'meeting_time' => $appointment->meeting_time,
                     'queue_number' => $appointment->queue_number,
                     'clinic_name' => $clinic?->name ?? '',
                     'clinic_location' => $clinic?->location ?? '',
-                ], function ($message) use ($user) {
-                    $message->to($user->email)
-                        ->subject('Xác nhận lịch hẹn khám');
-                });
+                ]);
             }
-
 
             return response()->json([
                 'status' => 1,
