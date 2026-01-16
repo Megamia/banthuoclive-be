@@ -34,5 +34,8 @@ return [
     'clarifai' => [
         'api_key' => env('CLARIFAI_API_KEY'),
     ],
+    'openrouter' => [
+        'key' => env('OPENROUTER_API_KEY'),
+    ],
 
 ];

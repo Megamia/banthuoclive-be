@@ -1,5 +1,6 @@
 <?php
 
+use Betod\Livotec\Models\Product;
 use Illuminate\Http\Request;
 use Dat\Chatbot\Models\ChatBot;
 use Illuminate\Support\Facades\Log;
@@ -55,20 +56,42 @@ Route::group(['prefix' => 'apiChatBot'], function () {
     Route::post('/chat', function (Request $request) {
         $message = trim($request->input('message', ''));
 
-        if (!$message) {
+        if ($message === '') {
             return response()->json(['reply' => 'Vui lòng nhập tin nhắn hợp lệ.'], 400);
         }
 
-        $chatResponse = ChatBot::where('question', strtolower($message))->inRandomOrder()->first();
+        if (isBuyIntent($message)) {
+
+            $lastKeyword = session('last_product_keyword');
+            $lastProductIds = session('last_products');
+
+            if ($lastKeyword && $lastProductIds) {
+                $products = Product::whereIn('id', $lastProductIds)->get();
+
+                if ($products->isNotEmpty()) {
+                    return response()->json([
+                        'reply' => 'Bạn muốn mua sản phẩm nào?',
+                        'products' => $products
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'reply' => 'Bạn muốn mua sản phẩm nào? Vui lòng nhập tên sản phẩm.'
+            ]);
+        }
+
+     
+        $chatResponse = ChatBot::where('question', mb_strtolower($message))->first();
         if ($chatResponse) {
             return response()->json(['reply' => $chatResponse->answer]);
         }
 
-        $productSearchResponse = handleProductFind($message);
-        $dataProducts = $productSearchResponse->getData(true)['products'] ?? [];
+        $productResponse = handleProductFind($message);
+        $data = $productResponse->getData(true);
 
-        if (!empty($dataProducts)) {
-            return $productSearchResponse;
+        if (!empty($data['products'])) {
+            return $productResponse;
         }
 
         return callOpenAPI($message);
