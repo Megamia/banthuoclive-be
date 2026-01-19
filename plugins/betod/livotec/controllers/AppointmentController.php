@@ -331,4 +331,45 @@ class AppointmentController extends Controller
             ]);
         }
     }
+    public function updateSchedulesByDoctor(Request $request, $doctorId)
+    {
+        $data = $request->input('schedules');
+
+        if (!is_array($data)) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Dữ liệu lịch không hợp lệ'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($doctorId, $data) {
+
+            Schedules::where('doctor_id', $doctorId)->delete();
+
+            foreach ($data as $item) {
+
+                if (
+                    empty($item['day_of_week']) ||
+                    empty($item['start_time']) ||
+                    empty($item['end_time'])
+                ) {
+                    continue;
+                }
+
+                Schedules::create([
+                    'doctor_id' => $doctorId,
+                    'day_of_week' => (int) $item['day_of_week'],
+                    'start_time' => $item['start_time'],
+                    'end_time' => $item['end_time'],
+                ]);
+            }
+        });
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Cập nhật lịch làm việc thành công'
+        ]);
+    }
+
+
 }

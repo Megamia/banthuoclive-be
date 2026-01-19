@@ -12,8 +12,11 @@ columns:
         label: 'Năm kinh nghiệm'
         type: number
         span: auto
-        min: 0
-        max: 60
+        min: '0'
+        max: '60'
     short_description:
         label: 'Mô tả ngắn'
+        type: text
+    email:
+        label: Email
         type: text

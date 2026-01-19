@@ -249,3 +249,6 @@ v1.0.89:
 v1.0.90:
     - 'Created table betod_livotec_clinics'
     - builder_table_create_betod_livotec_clinics.php
+v1.0.91:
+    - 'Updated table betod_livotec_doctor'
+    - builder_table_update_betod_livotec_doctor_6.php

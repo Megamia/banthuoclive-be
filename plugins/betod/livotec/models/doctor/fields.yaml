@@ -29,7 +29,7 @@ fields:
         span: left
         format: 'Y'
     phone:
-        label: Số điện thoại
+        label: 'Số điện thoại'
         span: auto
         type: text
     short_description:
@@ -56,3 +56,7 @@ fields:
             extension: auto
         span: auto
         type: fileupload
+    email:
+        label: Email
+        span: auto
+        type: text

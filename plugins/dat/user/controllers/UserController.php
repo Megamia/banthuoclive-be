@@ -4,6 +4,8 @@ namespace Dat\User\Controllers;
 use Backend;
 use BackendMenu;
 use Backend\Classes\Controller;
+use Betod\Livotec\Models\Doctor;
+use Betod\Livotec\Models\Schedules;
 use Dat\User\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -58,7 +60,15 @@ class UserController extends Controller
         $user->api_token = $token;
         $user->save();
 
+        $doctor = Doctor::where('email', $email)->first();
         $cookie = cookie('token', $token, 1440, '/', null, false, true);
+
+        if ($doctor) {
+            $schedules = Schedules::where('doctor_id', $doctor->id)
+                ->orderBy('day_of_week', 'asc')
+                ->orderBy('start_time', 'asc')
+                ->get();
+        }
 
         $userData = [
             'id' => $user->id,
@@ -70,6 +80,9 @@ class UserController extends Controller
             'district' => $user->district,
             'subdistrict' => $user->subdistrict,
             'address' => $user->address,
+            'is_doctor' => $doctor ? true : false,
+            'doctor_id' => $doctor ? $doctor->id : null,
+            'schedules' => $doctor ? $schedules : []
         ];
 
         return response()->json([
