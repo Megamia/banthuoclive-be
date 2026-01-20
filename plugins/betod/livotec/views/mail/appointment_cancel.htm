@@ -1,0 +1,27 @@
+<h2>Thông báo hủy lịch khám</h2>
+
+<p>Xin chào <b>{{ user_name }}</b>,</p>
+
+<p>
+Lịch khám của bạn với bác sĩ
+<b>{{ doctor_name }}</b>
+vào lúc
+<b>{{ meeting_time }}</b>
+đã bị hủy.
+</p>
+
+{% if clinic_name %}
+<p><b>Phòng khám:</b> {{ clinic_name }}</p>
+{% endif %}
+
+{% if clinic_location %}
+<p><b>Địa chỉ:</b> {{ clinic_location }}</p>
+{% endif %}
+
+<p>
+Chúng tôi thành thật xin lỗi vì sự bất tiện này.<br>
+Vui lòng đặt lại lịch vào thời gian khác.
+</p>
+
+<hr>
+<p>Hệ thống hỗ trợ đặt lịch khám</p>

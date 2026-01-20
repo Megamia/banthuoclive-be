@@ -20,3 +20,6 @@ columns:
     updated_at:
         label: 'Thời gian cập nhật lịch'
         type: datetime
+    status:
+        label: 'Trạng thái'
+        type: switch

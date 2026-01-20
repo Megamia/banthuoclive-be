@@ -252,3 +252,6 @@ v1.0.90:
 v1.0.91:
     - 'Updated table betod_livotec_doctor'
     - builder_table_update_betod_livotec_doctor_6.php
+v1.0.92:
+    - 'Updated table betod_livotec_appointment'
+    - builder_table_update_betod_livotec_appointment_5.php

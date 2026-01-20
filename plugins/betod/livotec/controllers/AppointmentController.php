@@ -113,6 +113,44 @@ class AppointmentController extends Controller
         }
     }
 
+    public function sendCancelAppointmentMailAPI($to, $data)
+    {
+        try {
+            Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('SENDGRID_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.sendgrid.com/v3/mail/send', [
+                        'personalizations' => [
+                            [
+                                'to' => [
+                                    ['email' => $to]
+                                ],
+                                'subject' => 'Thông báo hủy lịch khám',
+                            ]
+                        ],
+                        'from' => [
+                            'email' => env('MAIL_FROM_ADDRESS'),
+                            'name' => env('MAIL_FROM_NAME'),
+                        ],
+                        'content' => [
+                            [
+                                'type' => 'text/html',
+                                'value' => view(
+                                    'betod.livotec::mail.appointment_cancel',
+                                    $data
+                                )->render(),
+                            ]
+                        ],
+                    ]);
+        } catch (\Throwable $e) {
+            Log::error('SendGrid cancel mail error', [
+                'email' => $to,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+
     public function createAppointment(Request $request)
     {
         $data = $request->input('data');
@@ -163,11 +201,15 @@ class AppointmentController extends Controller
                     'doctor_id' => $validated['doctor_id'],
                     'meeting_time' => $slot,
                     'queue_number' => $queueNumber,
+                    'status' => 'booked'
                 ]);
             });
 
+            $appointment = Appointment::with(['user', 'doctor'])->find($appointment->id);
+
             $user = $appointment->user;
             $doctor = $appointment->doctor;
+
             $clinic = \Betod\Livotec\Models\Clinics::where('doctor_id', $doctor->id)->first();
 
             if ($user?->email) {
@@ -312,6 +354,7 @@ class AppointmentController extends Controller
                     'clinic_id' => $item->clinic->id ?? null,
                     'clinic_name' => $item->clinic->name ?? null,
                     'clinic_location' => $item->clinic->location ?? null,
+                    'status' => $item->status ?? null
                 ];
             });
 
@@ -333,28 +376,71 @@ class AppointmentController extends Controller
     }
     public function updateSchedulesByDoctor(Request $request, $doctorId)
     {
-        $data = $request->input('schedules');
+        $newSchedules = $request->input('schedules');
 
-        if (!is_array($data)) {
+        if (!is_array($newSchedules)) {
             return response()->json([
                 'status' => 0,
                 'message' => 'Dữ liệu lịch không hợp lệ'
             ], 422);
         }
 
-        DB::transaction(function () use ($doctorId, $data) {
+        DB::transaction(function () use ($doctorId, $newSchedules) {
+
+            $oldSchedules = Schedules::where('doctor_id', $doctorId)->get();
+
+            foreach ($oldSchedules as $old) {
+
+                $stillExists = collect($newSchedules)->contains(function ($item) use ($old) {
+                    return
+                        (int) $item['day_of_week'] === $old->day_of_week &&
+                        $item['start_time'] === $old->start_time &&
+                        $item['end_time'] === $old->end_time;
+                });
+
+                if (!$stillExists) {
+
+                    $appointments = Appointment::with(['user', 'doctor'])
+                        ->where('doctor_id', $doctorId)
+                        ->where('status', 'booked')
+                        ->whereRaw('WEEKDAY(meeting_time) + 1 = ?', [$old->day_of_week])
+                        ->whereTime('meeting_time', '>=', $old->start_time)
+                        ->whereTime('meeting_time', '<=', $old->end_time)
+                        ->get();
+
+                    foreach ($appointments as $appointment) {
+
+                        $appointment->update([
+                            'status' => 'canceled'
+                        ]);
+
+                        if ($appointment->user?->email) {
+                            $this->sendCancelAppointmentMailAPI(
+                                $appointment->user->email,
+                                [
+                                    'user_name' => trim(
+                                        ($appointment->user->first_name ?? '') . ' ' .
+                                        ($appointment->user->last_name ?? '')
+                                    ),
+                                    'doctor_name' => $appointment->doctor->name,
+                                    'meeting_time' => $appointment->meeting_time,
+                                ]
+                            );
+                        }
+                    }
+                }
+
+            }
 
             Schedules::where('doctor_id', $doctorId)->delete();
 
-            foreach ($data as $item) {
-
+            foreach ($newSchedules as $item) {
                 if (
                     empty($item['day_of_week']) ||
                     empty($item['start_time']) ||
                     empty($item['end_time'])
-                ) {
+                )
                     continue;
-                }
 
                 Schedules::create([
                     'doctor_id' => $doctorId,
@@ -370,6 +456,5 @@ class AppointmentController extends Controller
             'message' => 'Cập nhật lịch làm việc thành công'
         ]);
     }
-
 
 }

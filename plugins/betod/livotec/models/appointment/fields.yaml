@@ -20,3 +20,7 @@ fields:
         mode: datetime
         span: auto
         type: datepicker
+    status:
+        label: 'Trạng thái'
+        span: auto
+        type: text

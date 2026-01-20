@@ -24,7 +24,8 @@ class Appointment extends Model
         'user_id',
         'doctor_id',
         'meeting_time',
-        'queue_number'
+        'queue_number',
+        'status'
     ];
     public $belongsTo = [
         'doctor' => [
